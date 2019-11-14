@@ -14,3 +14,5 @@ $(IMAGE_TARGETS):
 	$(MAKE) -f ../docker-image.mk -C $@ $(ACTIVE_GOALS)
 
 .PHONY: $(IMAGE_GOALS) $(IMAGE_TARGETS)
+
+nginx-php-fpm/: base-alpine/
