@@ -30,10 +30,10 @@ endif
 # Mark as release if current commit matches build tag commit
 GIT_TAG_COMMIT := $(strip $(shell git rev-list "$(BUILD_TAG)" --max-count=1 2>&-))
 ifeq ($(GIT_COMMIT),$(GIT_TAG_COMMIT))
-$(info producing release: current commit [$(GIT_COMMIT)] matches tag commit [$(GIT_TAG_COMMIT)])
+$(info release build: current commit [$(GIT_COMMIT)] matches tag commit [$(GIT_TAG_COMMIT)])
 RELEASE_GOAL_CHECK := yes
 else
-$(info skipping release: current commit [$(GIT_COMMIT)] does not match tag commit [$(GIT_TAG_COMMIT)])
+$(info test build: current commit [$(GIT_COMMIT)] does not match tag commit [$(GIT_TAG_COMMIT)])
 RELEASE_GOAL_CHECK := no
 endif
 
