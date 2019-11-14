@@ -1,0 +1,99 @@
+#!/bin/sh
+#shellcheck shell=ash
+set -euo pipefail
+
+#shellcheck disable=SC2059
+scp_log() {
+    local _level _message _timestamp
+
+    _level="${1}"; shift
+    _message="$(printf "${@}")"
+    _timestamp="$(date -Iseconds)"
+    
+    printf '[%s] %-5s: %s\n' "${_timestamp}" "${_level}" "${_message}"
+}
+
+scp_debug() {
+    scp_log "DEBUG" "${@}"
+}
+
+scp_info() {
+    scp_log "INFO" "${@}"
+}
+
+scp_warn() {
+    scp_log "WARN" "${@}"
+}
+
+scp_error() {
+    scp_log "ERROR" "${@}"
+}
+
+scp_fatal() {
+    scp_log "FATAL" "${@}"
+    exit 1
+}
+
+scp_runas() {
+    local _target_user="${1}"; shift
+    local _tuid _tgid _tgroups
+    local _euid _egid _egroups
+
+    # Determine target user identity
+    _tuid="$(id -u "${_target_user}")"
+    _tgid="$(id -g "${_target_user}")"
+    _tgroups="$(id -G "${_target_user}" | xargs -n1 | sort | xargs | tr ' ' ',')"
+
+    # Determine current user identity
+    _euid="$(id -u)"
+    _egid="$(id -g)"
+    _egroups="$(id -G | xargs -n1 | sort | xargs | tr ' ' ',')"
+
+    # Output debug information
+    scp_info "scp-runas: binary=[%s] effective[uid=%d gid=%d groups=%s] target=[uid=%d gid=%d groups=%s]" \
+        "${1}" "${_euid}" "${_egid}" "${_egroups}" "${_tuid}" "${_tgid}" "${_tgroups}"
+
+    # Compare current with target user identity and skip if already correct
+    if [ "${_tuid}" = "${_euid}" ] \
+        && [ "${_tgid}" = "${_egid}" ] \
+        && [ "${_tgroups}" = "${_egroups}" ]; then
+        scp_debug "scp-runas: privileges already correct, exec [%s]" "${*}"
+        exec "${@}"
+    fi
+
+    # Change to target user identity and exec process
+    scp_debug "scp-runas: changing privileges, exec [%s] with su-exec" "${*}"
+    exec su-exec "${_target_user}" "${@}"
+}
+
+scp_prepare_dir() {
+    local _path="${1}"
+    local _owner="${2}"
+    local _mode="${3}"
+
+    scp_info "scp-prepare-dir: preparing directory [%s] with owner [%s] and mode [%s]" \
+        "${_path}" "${_owner}" "${_mode}"
+
+    mkdir -p "${_path}"
+    chown "${_owner}" "${_path}"
+    chmod "${_mode}" "${_path}"
+}
+
+scp_relocate() {
+    local _old_path="${1}"
+    local _new_path="${2}"
+    local _old_owner _old_mode
+
+    _old_owner="$(stat -c '%u:%g' "${_old_path}/")"
+    _old_mode="$(stat -c '%a' "${_old_path}/")"
+
+    scp-info "scp-relocate: relocating directory [%s] to [%s]" \
+        "${_old_path}" "${_new_path}"
+
+    mkdir -p "${_new_path}"
+    chown "${_old_owner}" "${_new_path}"
+    chmod "${_old_mode}" "${_new_path}"
+    
+    rm -Rf "${_old_path}"
+    ln -sf "${_new_path}" "${_old_path}"
+}
