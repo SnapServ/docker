@@ -5,4 +5,5 @@ services:
   - docker
 
 script:
-  - COMMIT_RANGE="${TRAVIS_COMMIT_RANGE}" make auto
+  - export COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-}"
+  - make auto
