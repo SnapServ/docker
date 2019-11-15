@@ -1,0 +1,11 @@
+#!/bin/sh
+#shellcheck shell=ash
+set -euo pipefail
+. /usr/lib/scp
+
+if [ $# -lt 1 ]; then
+    scp_fatal "usage: ${0} <method> [args...]"
+fi
+
+_method="scp_${1}"; shift
+${_method} "${@}"

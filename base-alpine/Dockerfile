@@ -7,11 +7,9 @@ RUN true \
     gomplate \
     libcap \
     multirun \
+    openssl \
     su-exec \
     && true
 
 COPY rootfs /
-
-RUN true \
-    && chmod 0755 /usr/bin/scp-* \
-    && true
+RUN chmod 0755 /usr/bin/scp

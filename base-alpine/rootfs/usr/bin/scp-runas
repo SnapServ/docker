@@ -1,6 +1,0 @@
-#!/bin/sh
-#shellcheck shell=ash
-set -euo pipefail
-. /usr/lib/scp
-
-scp_runas "${@}"

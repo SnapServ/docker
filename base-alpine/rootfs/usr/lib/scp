@@ -97,3 +97,25 @@ scp_relocate() {
     rm -Rf "${_old_path}"
     ln -sf "${_new_path}" "${_old_path}"
 }
+
+scp_certificate() {
+    local _owner="${1}"
+    local _cert_path="${2}"
+    local _key_path="${3}"
+    local _common_name="${4:-$(hostname)}"
+    local _san="${5:-DNS:${_common_name}}"
+    
+    (
+        umask 077
+
+        scp_info "generating self-signed certificate [%s] with SAN [%s]" \
+            "${_common_name}" "${_san}"
+
+        openssl req -x509 -nodes -days 3650 \
+            -subj "/CN=${_common_name}" \
+            -addext "subjectAltName=${_san}" \
+            -newkey rsa:2048 -keyout "${_key_path}" \
+            -out "${_cert_path}"
+        chown "${_owner}" "${_cert_path}" "${_key_path}"
+    )
+}
