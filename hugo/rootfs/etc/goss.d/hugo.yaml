@@ -1,0 +1,26 @@
+package:
+  hugo:
+    installed: true
+
+process:
+  hugo:
+    running: true
+
+port:
+  tcp6:1313:
+    listening: true
+    ip: ['::']
+
+file:
+  /tmp/hugo: &file-hugo-dir
+    exists: true
+    mode: '0700'
+    owner: 'hugo'
+    group: 'hugo'
+    filetype: 'directory'
+  
+  /tmp/hugo-quickstart: *file-hugo-dir
+
+http:
+  http://localhost:1313/:
+    status: 200
