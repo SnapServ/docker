@@ -87,7 +87,7 @@ scp_relocate() {
     _old_owner="$(stat -c '%u:%g' "${_old_path}/")"
     _old_mode="$(stat -c '%a' "${_old_path}/")"
 
-    scp-info "scp-relocate: relocating directory [%s] to [%s]" \
+    scp_info "scp-relocate: relocating directory [%s] to [%s]" \
         "${_old_path}" "${_new_path}"
 
     mkdir -p "${_new_path}"

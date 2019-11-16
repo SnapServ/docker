@@ -2,6 +2,7 @@ FROM alpine:3.10.3
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 
 RUN true \
+    # Install required packages
     && apk add --no-cache --virtual .base \
     ca-certificates \
     gomplate \
