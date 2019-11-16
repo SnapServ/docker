@@ -40,6 +40,3 @@ $(IMAGE_TARGETS):
 	$(MAKE) -f ../docker-image.mk -C $@ $(ACTIVE_GOALS)
 
 .PHONY: default auto $(IMAGE_GOALS) $(IMAGE_TARGETS)
-
-# Image target dependencies
-nginx-php-fpm/: base-alpine/
