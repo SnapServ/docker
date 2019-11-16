@@ -22,6 +22,13 @@ endif
 TAGGED_TARGETS := $(strip $(shell git describe --abbrev=0 --tags --exact-match 2>&- | awk -F/ '{print $$(1)"/"}'))
 CHANGED_IMAGES := $(sort $(TAGGED_TARGETS) $(COMMITTED_TARGETS))
 
+# Default goal builds all images
+default: $(IMAGE_TARGETS)
+
+# Auto-detect changes and only build when necessary
+auto: $(CHANGED_IMAGES)
+	$(info Changed Images: $(CHANGED_IMAGES))
+
 # Execute goal on all active targets
 $(IMAGE_GOALS): $(ACTIVE_TARGETS)
 
@@ -32,11 +39,7 @@ $(IMAGE_TARGETS):
 
 	$(MAKE) -f ../docker-image.mk -C $@ $(ACTIVE_GOALS)
 
-# Auto-detect changes and only build when necessary
-auto: $(CHANGED_IMAGES)
-	$(info Changed Images: $(CHANGED_IMAGES))
-
-.PHONY: $(IMAGE_GOALS) $(IMAGE_TARGETS) auto
+.PHONY: default auto $(IMAGE_GOALS) $(IMAGE_TARGETS)
 
 # Image target dependencies
 nginx-php-fpm/: base-alpine/
