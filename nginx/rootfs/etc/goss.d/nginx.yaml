@@ -1,0 +1,42 @@
+package:
+  nginx:
+    installed: true
+
+process:
+  nginx:
+    running: true
+
+port:
+  tcp:8443:
+    listening: true
+    ip: ['0.0.0.0']
+
+  tcp6:8443:
+    listening: true
+    ip: ['::']
+
+file:
+  /tmp/nginx: &file-nginx-dir
+    exists: true
+    mode: '0700'
+    owner: 'nginx'
+    group: 'nginx'
+    filetype: 'directory'
+
+  /run/nginx: *file-nginx-dir
+
+  /run/nginx/ssl.crt: &file-nginx-ssl
+    exists: true
+    mode: '0600'
+    owner: 'nginx'
+    group: 'nginx'
+    filetype: 'file'
+
+  /run/nginx/ssl.key: *file-nginx-ssl
+
+http:
+  https://localhost:8443/nginx-health:
+    status: 200
+    allow-insecure: true
+    body:
+      - '/^OK$/'
