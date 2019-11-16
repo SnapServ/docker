@@ -55,9 +55,15 @@ command:
       - '/^nobody$/'
 
   scp/prepare-dir:
-    exec: 'scp prepare-dir /tmp/test nobody:root 1775'
+    exec: |
+      scp prepare-dir /tmp/test nobody:root 1775
+      stat -c '%U:%G:%a' /tmp/test
     exit-status: 0
+    stdout:
+      - '/^nobody:root:1775$/'
 
   scp/certificate:
-    exec: 'scp certificate nobody /tmp/ssl.crt /tmp/ssl.key'
+    exec: |
+      rm -f /tmp/ssl.crt /tmp/ssl.key;
+      scp certificate nobody /tmp/ssl.crt /tmp/ssl.key
     exit-status: 0
