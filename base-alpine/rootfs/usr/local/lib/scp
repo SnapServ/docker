@@ -106,7 +106,7 @@ scp_certificate() {
     local _san="${5:-DNS:${_common_name}}"
     
     (
-        umask 077
+        umask 377
 
         scp_info "generating self-signed certificate [%s] with SAN [%s]" \
             "${_common_name}" "${_san}"
