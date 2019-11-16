@@ -1,5 +1,11 @@
 {
+  "automerge": true,
+  "automergeType": "branch",
   "extends": [
-    "config:base"
-  ]
+    "config:base",
+    "docker:enableMajor"
+  ],
+  "major": {
+    "automerge": false
+  }
 }
