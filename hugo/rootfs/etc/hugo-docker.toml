@@ -1,0 +1,9 @@
+[caches]
+[caches.getjson]
+dir = ":cacheDir/:project/data"
+[caches.getcsv]
+dir = ":cacheDir/:project/data"
+[caches.images]
+dir = ":cacheDir/:project/resources"
+[caches.assets]
+dir = ":cacheDir/:project/resources"
