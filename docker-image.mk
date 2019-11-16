@@ -19,6 +19,7 @@ DOCKER_LABEL_VENDOR := SnapServ
 DOCKER_LABEL_URL := https://snapserv.net
 DOCKER_LABEL_VCS_URL := https://github.com/snapserv/docker
 DOCKER_BUILD_FLAGS ?=
+GOSS_OPTIONS := --color --retry-timeout 30s --sleep 1s
 
 # Check if working directory is dirty
 GIT_CLEAN_REPO_CHECK := $(strip $(shell git status --porcelain))
@@ -91,9 +92,31 @@ lint:
 
 # Test container image with Goss
 goss: build
-	docker run -it --rm --entrypoint "/usr/local/bin/goss" \
-		$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG) \
-		validate --retry-timeout 30s --sleep 1s
+	# Determine entrypoint of image
+	$(eval DOCKER_IMAGE_ENTRYPOINT := $(shell docker inspect \
+		--format '{{ index .Config.Entrypoint }}' \
+		"$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)" \
+	))
+	$(eval export DOCKER_IMAGE_ENTRYPOINT)
+
+	# Run Goss for automated testing
+	# - Image has no entrypoint: execute goss in container
+	# - Image has an entrypoint: use dgoss for executing tests in container
+	if [ "${DOCKER_IMAGE_ENTRYPOINT}" == "[]" ]; then \
+		docker run -it --rm \
+			--read-only --tmpfs /run --tmpfs /tmp \
+			--entrypoint "/usr/local/bin/goss" \
+			$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG) \
+			validate $(GOSS_OPTIONS); \
+	else \
+		GOSS_FILES_PATH="../" \
+		GOSS_FILES_STRATEGY="mount" \
+		GOSS_OPTS="$(GOSS_OPTIONS)" \
+			dgoss run -it --rm \
+			--read-only --tmpfs /run --tmpfs /tmp \
+			"$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)"; \
+	fi
+
 
 # Login to registry
 login:
