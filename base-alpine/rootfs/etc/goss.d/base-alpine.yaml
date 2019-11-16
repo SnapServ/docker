@@ -1,0 +1,63 @@
+file:
+  /usr/local/bin/scp:
+    exists: true
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+  /usr/local/lib/scp:
+    exists: true
+    mode: '0644'
+    owner: 'root'
+    group: 'root'
+
+command:
+  scp/log/debug:
+    exec: 'scp debug "Hello %s" "World"'
+    exit-status: 0
+    stdout:
+      - '/\bDEBUG\s*: Hello World$/'
+
+  scp/log/info:
+    exec: 'scp info "Hello %s" "World"'
+    exit-status: 0
+    stdout:
+      - '/\bINFO\s*: Hello World$/'
+
+  scp/log/warn:
+    exec: 'scp warn "Hello %s" "World"'
+    exit-status: 0
+    stdout:
+      - '/\bWARN\s*: Hello World$/'
+
+  scp/log/error:
+    exec: 'scp error "Hello %s" "World"'
+    exit-status: 0
+    stdout:
+      - '/\bERROR\s*: Hello World$/'
+
+  scp/log/fatal:
+    exec: 'scp fatal "Hello %s" "World"'
+    exit-status: 1
+    stdout:
+      - '/\bFATAL\s*: Hello World$/'
+
+  scp/runas/root:
+    exec: 'scp runas root whoami'
+    exit-status: 0
+    stdout:
+      - '/^root$/'
+
+  scp/runas/nobody:
+    exec: 'scp runas nobody whoami'
+    exit-status: 0
+    stdout:
+      - '/^nobody$/'
+
+  scp/prepare-dir:
+    exec: 'scp prepare-dir /tmp/test nobody:root 1775'
+    exit-status: 0
+
+  scp/certificate:
+    exec: 'scp certificate nobody /tmp/ssl.crt /tmp/ssl.key'
+    exit-status: 0
