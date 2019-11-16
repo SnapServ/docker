@@ -1,0 +1,36 @@
+{{ with index $.Site.Data.products (.Get 0) }}
+<div class="product-box {{ cond (eq .popular true) "product-box-popular" "" }}">
+    {{ if eq .popular true }}
+    <div class="product-popular">
+        Most Popular
+    </div>
+    {{ end }}
+    <div class="product-header">
+        <h4>{{ .name }}</h4>
+        <p>{{ .summary | safeHTML }}</p>
+    </div>
+    <div class="product-price">
+        {{ .priceValue }}
+        {{ if (isset . "priceTerm") | and (ne .priceTerm "") }}
+        <span class="term">/ {{ .priceTerm | upper }}</span>
+        {{ end }}
+    </div>
+    <div class="product-features">
+        <ul>
+            {{ range .primaryFeatures }}
+            <li>{{ . | safeHTML }}</li>
+            {{ end }}
+        </ul>
+        <ul>
+            {{ range .secondaryFeatures }}
+            <li>{{ . | safeHTML }}</li>
+            {{ end }}
+        </ul>
+    </div>
+    <div class="product-order">
+        <a class="button button-secondary" href="{{ .orderLink | absURL }}">
+            <i class="fas fa-shopping-cart icon-left"></i>{{ .orderText | default "Order Now" }}
+        </a>
+    </div>
+</div>
+{{ end }}

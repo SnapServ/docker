@@ -1,0 +1,16 @@
+{{ with .Site.Params.home.announcement }}
+{{ if eq .enabled true }}
+<section id="notification" data-dismissible="true" data-title="" data-expires="">
+    <div class="container">
+        <p>
+            {{ .message | safeHTML }}
+            {{ if (isset . "target") | and (ne .target "") }}
+            <a class="text-margin-left" href="{{ ref $ .target }}">
+                Learn more<i class="fas fa-angle-right icon-right"></i>
+            </a>
+            {{ end }}
+        </p>
+    </div>
+</section>
+{{ end }}
+{{ end }}

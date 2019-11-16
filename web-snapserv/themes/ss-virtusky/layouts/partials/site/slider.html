@@ -1,0 +1,17 @@
+<section class="content-row content-row-color content-row-clouds">
+    <div class="content-slider animate-container-slide" data-nav="true" data-rotation="5">
+        {{ range .Site.Params.sliderEntries }}
+        <a class="slide" data-title="{{ .title | plainify }}" href="{{ ref $ .target }}">
+            <div class="container">
+                <header class="content-header content-header-large content-header-uppercase">
+                    <h1>{{ .title | safeHTML }}</h1>
+                    <p>{{ .content | safeHTML }}</p>
+                </header>
+                {{ if (isset . "image") | and (ne .image "") }}
+                <img src="{{ .image | relURL }}" alt="{{ .image_alt | default .title }}">
+                {{ end }}
+            </div>
+        </a>
+        {{ end }}
+    </div>
+</section>

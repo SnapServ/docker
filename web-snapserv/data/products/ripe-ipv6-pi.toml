@@ -1,0 +1,15 @@
+name = "RIPE IPv6 PI"
+summary = "IPv6 PI Assignment"
+priceValue = "€99.99"
+priceTerm = "year"
+primaryFeatures = [
+    "<strong>/48</strong> size, larger requires justification",
+    "Announce anywhere in the RIPE area",
+    "Transferrable between sponsoring LIRs",
+    "Usage only allowed by end user"
+]
+secondaryFeatures = ["""
+Please note that it is up to the RIPE NCC if requests larger than /48 are justified or not -
+we will gladly guide you through the process step-by-step.
+"""]
+orderLink = "https://client.snapserv.net/order/main/index/services"

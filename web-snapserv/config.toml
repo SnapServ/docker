@@ -1,0 +1,34 @@
+baseURL = "https://snapserv.net/"
+languageCode = "en-us"
+title = "SnapServ Mathis"
+theme = "ss-virtusky"
+
+[params]
+contactEmailAddress = "support@snapserv.net"
+clientAreaLink = "https://client.snapserv.net/"
+knowledgeBaseLink = "https://client.snapserv.net/client/plugin/support_manager/knowledgebase/"
+statusPageLink = "https://status.snapserv.net/"
+ticketingLink = "https://client.snapserv.net/client/plugin/support_manager/client_tickets/departments/"
+
+# [[params.testimonials]]
+# author = "Chell"
+# text = "The cake is a lie."
+
+[params.home.announcement]
+enabled = false
+message = "<b>10% discount</b> on all RIPE All-in-One bundle orders until 2019-10-31 with coupon code <b>HEADSTART</b>"
+target = "/services/ripe"
+
+[[params.sliderEntries]]
+target = "services/ripe"
+title = "<mark>RIPE</mark> LIR Services"
+content = """
+Reliable and trustworthy RIPE sponsoring LIR and IP leasing services, starting at just
+<span class="text-color-secondary">€24.99 / year</span>"""
+
+[[params.sliderEntries]]
+target = "services/bgp-tunnel"
+title = "<mark>BGP</mark> Tunnels"
+content = """
+Free IPv6 BGP tunnels available for educational and research purposes. Get in touch with us today!
+"""

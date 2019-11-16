@@ -1,0 +1,13 @@
+name = "BGP Tunnel"
+summary = "IPv6 full-feed via GRE tunnel"
+priceValue = "FREE"
+primaryFeatures = [
+    "Available in <strong>Frankfurt, Germany</strong>"
+]
+secondaryFeatures = ["""
+    Measure your latency to our endpoints:<br>
+    core1.fra1.snapserv.link (FRA1)<br>
+    core2.fra1.snapserv.link (FRA1)
+"""]
+orderLink = "https://client.snapserv.net/order/main/index/services"
+orderText = "Request Now"
