@@ -1,4 +1,4 @@
-FROM quay.io/snapserv/base-alpine:1.0.0
+FROM quay.io/snapserv/base-alpine:1.0.1
 
 RUN true \
     && apk add --no-cache \
