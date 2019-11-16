@@ -1,0 +1,58 @@
+process:
+  consul:
+    running: true
+
+port:
+  # Consul RPC
+  tcp6:8300:
+    listening: true
+    ip: ['::']
+
+  # Consul LAN Serf
+  tcp6:8301:
+    listening: true
+    ip: ['::']
+  udp6:8301:
+    listening: true
+    ip: ['::']
+
+  # Consul WAN Serf
+  tcp6:8302:
+    listening: true
+    ip: ['::']
+  udp6:8302:
+    listening: true
+    ip: ['::']
+
+  # Consul HTTP
+  tcp6:8500:
+    listening: true
+    ip: ['::']
+
+  # Consul DNS
+  tcp6:8600:
+    listening: true
+    ip: ['::']
+  udp6:8600:
+    listening: true
+    ip: ['::']
+
+file:
+  /usr/local/bin/consul:
+    exists: true
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+  /cts/consul/config: &file-consul-cts
+    exists: true
+    mode: '0700'
+    owner: 'consul'
+    group: 'consul'
+    filetype: 'directory'
+
+  /cts/consul/data: *file-consul-cts
+
+http:
+  http://localhost:8500/v1/status/leader:
+    status: 200
