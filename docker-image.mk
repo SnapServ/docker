@@ -59,7 +59,7 @@ $(info )
 # Combined targets
 default: test
 release: test push
-test: lint build output
+test: lint build goss output
 
 # Automated CI target (release or test)
 ifeq ($(RELEASE_GOAL_CHECK),yes)
@@ -88,6 +88,12 @@ lint:
 	cat Dockerfile | docker run \
 		-i --rm hadolint/hadolint hadolint - \
 		--ignore DL3007 --ignore DL3018 --ignore SC1091
+
+# Test container image with Goss
+goss: build
+	docker run -it --rm --entrypoint "/usr/local/bin/goss" \
+		$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG) \
+		validate --retry-timeout 30s --sleep 1s
 
 # Login to registry
 login:
