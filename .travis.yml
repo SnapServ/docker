@@ -4,6 +4,9 @@ language: minimal
 services:
   - docker
 
+install:
+  - curl -fsSL https://goss.rocks/install | sh
+
 script:
   - export COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-}"
   - make auto

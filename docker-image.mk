@@ -102,7 +102,7 @@ goss: build
 	# Run Goss for automated testing
 	# - Image has no entrypoint: execute goss in container
 	# - Image has an entrypoint: use dgoss for executing tests in container
-	if [ "${DOCKER_IMAGE_ENTRYPOINT}" == "[]" ]; then \
+	if [ "${DOCKER_IMAGE_ENTRYPOINT}" = "[]" ]; then \
 		docker run -it --rm \
 			--read-only --tmpfs /run --tmpfs /tmp \
 			--entrypoint "/usr/local/bin/goss" \
