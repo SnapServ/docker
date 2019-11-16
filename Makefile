@@ -22,11 +22,16 @@ endif
 TAGGED_TARGETS := $(strip $(shell git describe --abbrev=0 --tags --exact-match 2>&- | awk -F/ '{print $$(1)"/"}'))
 CHANGED_IMAGES := $(sort $(TAGGED_TARGETS) $(COMMITTED_TARGETS))
 
-# Default goal builds all images
-default: $(IMAGE_TARGETS)
+# If no changed images were found, build all of them
+ifeq ($(CHANGED_IMAGES),)
+CHANGED_IMAGES_FALLBACK := $(IMAGE_TARGETS)
+endif
+
+# Build all images unconditionally
+all: $(IMAGE_TARGETS)
 
 # Auto-detect changes and only build when necessary
-auto: $(CHANGED_IMAGES)
+auto: $(CHANGED_IMAGES) $(CHANGED_IMAGES_FALLBACK)
 	$(info Changed Images: $(CHANGED_IMAGES))
 
 # Execute goal on all active targets
@@ -39,4 +44,4 @@ $(IMAGE_TARGETS):
 
 	$(MAKE) -f ../docker-image.mk -C $@ $(ACTIVE_GOALS)
 
-.PHONY: default auto $(IMAGE_GOALS) $(IMAGE_TARGETS)
+.PHONY: all auto $(IMAGE_GOALS) $(IMAGE_TARGETS)
