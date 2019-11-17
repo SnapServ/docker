@@ -1,0 +1,30 @@
+process:
+  traefik:
+    running: true
+
+port:
+  tcp6:8080:
+    listening: true
+    ip: ['::']
+
+  tcp6:8081:
+    listening: true
+    ip: ['::']
+
+  tcp6:8443:
+    listening: true
+    ip: ['::']
+
+file:
+  /etc/traefik:
+    exists: true
+    mode: '0700'
+    owner: 'traefik'
+    group: 'traefik'
+    filetype: 'directory'
+
+http:
+  http://localhost:8081/ping:
+    status: 200
+    body:
+      - '/^OK$/'

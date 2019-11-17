@@ -1,0 +1,10 @@
+[entryPoints]
+  [entryPoints.web]
+    address = ":8080"
+  [entryPoints.web-secure]
+    address = ":8443"
+  [entryPoints.ping]
+    address = ":8081"
+
+[ping]
+  entryPoint = "ping"
