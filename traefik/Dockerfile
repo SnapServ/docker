@@ -23,12 +23,7 @@ RUN true \
     && true
 
 COPY rootfs /
-RUN true \
-    # Ensure correct permissions for copied data
-    && chmod 0755 /docker-entrypoint.sh \
-    && chown -R traefik:traefik /etc/traefik \
-    && chmod 0700 /etc/traefik \
-    && true
+RUN chmod 0755 /docker-entrypoint.sh
 
 EXPOSE 8080/tcp 8081/tcp 8443/tcp
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
