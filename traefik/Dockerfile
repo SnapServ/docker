@@ -14,6 +14,10 @@ RUN true \
     # Add system account and group
     && addgroup -S traefik \
     && adduser -S -s /bin/false -G traefik traefik \
+    # Prepare directories
+    && mkdir -p /cts/traefik/config /cts/traefik/data \
+    && chown traefik:traefik /cts/traefik/* \
+    && chmod 0700 /cts/traefik/* \
     # Remove build-time dependencies
     && apk del .build \
     && true
@@ -28,3 +32,4 @@ RUN true \
 
 EXPOSE 8080/tcp 8081/tcp 8443/tcp
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
+VOLUME [ "/cts/traefik/config", "/cts/traefik/data" ]

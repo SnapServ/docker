@@ -23,6 +23,15 @@ file:
     group: 'traefik'
     filetype: 'directory'
 
+  /cts/traefik/config: &file-traefik-cts
+    exists: true
+    mode: '0700'
+    owner: 'traefik'
+    group: 'traefik'
+    filetype: 'directory'
+
+  /cts/traefik/data: *file-traefik-cts
+
 http:
   http://localhost:8081/ping:
     status: 200

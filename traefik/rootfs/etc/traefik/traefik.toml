@@ -8,3 +8,8 @@
 
 [ping]
   entryPoint = "ping"
+
+[providers]
+  [providers.file]
+    directory = "/cts/traefik/config"
+    watch = true
