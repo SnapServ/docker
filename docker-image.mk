@@ -28,13 +28,18 @@ ifneq ($(GIT_CLEAN_REPO_CHECK),yes)
 DOCKER_IMAGE_TAG := $(DOCKER_IMAGE_TAG)-dirty
 endif
 
-# Mark as release if current commit matches build tag commit
+# Mark as release if current commit matches build tag commit (skip in debug)
 GIT_TAG_COMMIT := $(strip $(shell git rev-list "$(BUILD_TAG)" --max-count=1 2>&-))
+ifeq ($(DEBUG),)
 ifeq ($(GIT_COMMIT),$(GIT_TAG_COMMIT))
 $(info release build: current commit [$(GIT_COMMIT)] matches tag commit [$(GIT_TAG_COMMIT)])
 RELEASE_GOAL_CHECK := yes
 else
 $(info test build: current commit [$(GIT_COMMIT)] does not match tag commit [$(GIT_TAG_COMMIT)])
+RELEASE_GOAL_CHECK := no
+endif
+else
+$(info test build: forced for commit [$(GIT_COMMIT)] due to DEBUG variable being set)
 RELEASE_GOAL_CHECK := no
 endif
 
