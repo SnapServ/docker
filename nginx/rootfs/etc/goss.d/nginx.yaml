@@ -7,11 +7,11 @@ process:
     running: true
 
 port:
-  tcp:8443:
+  tcp:8080:
     listening: true
     ip: ['0.0.0.0']
 
-  tcp6:8443:
+  tcp6:8080:
     listening: true
     ip: ['::']
 
@@ -25,17 +25,8 @@ file:
 
   /run/nginx: *file-nginx-dir
 
-  /run/nginx/ssl.crt: &file-nginx-ssl
-    exists: true
-    mode: '0600'
-    owner: 'nginx'
-    group: 'nginx'
-    filetype: 'file'
-
-  /run/nginx/ssl.key: *file-nginx-ssl
-
 http:
-  https://localhost:8443/nginx-health:
+  http://localhost:8080/nginx-health:
     status: 200
     allow-insecure: true
     body:

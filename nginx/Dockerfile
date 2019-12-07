@@ -22,5 +22,5 @@ RUN true \
     && scp relocate /var/lib/nginx/logs /tmp/nginx \
     && true
 
-EXPOSE 8443/tcp
+EXPOSE 8080/tcp
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
