@@ -1,4 +1,4 @@
-FROM quay.io/snapserv/base-alpine:1.0.4@sha256:9b87e662728d9b111341504349607e6b266f359361ba435d669b1672dcd1b896
+FROM quay.io/snapserv/base-alpine:1.0.5@sha256:db1eef0252b868acb67634a4321c0225fa8415bdd997bf5457d5acffca6d4826
 
 RUN true \
     # Install required packages
