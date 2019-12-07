@@ -8,7 +8,6 @@ RUN true \
     && apk add --no-cache --virtual .base \
     ca-certificates \
     libcap \
-    openssl \
     su-exec \
     # Install build-time dependencies
     && apk add --no-cache --virtual .build \
