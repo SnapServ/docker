@@ -106,7 +106,7 @@ goss: build
 	$(eval export GOSS_OPTS)
 
 	# Run dgoss for testing docker images without goss
-	dgoss run -it --rm \
+	dgoss run -it --rm -e GOSS=yes \
 		--read-only --tmpfs /run --tmpfs /tmp \
 		"$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)"
 
