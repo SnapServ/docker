@@ -67,9 +67,9 @@ command:
     exec: |
       set -euo pipefail
       export TEST="Hello World"
-      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/template1
-      cat /tmp/template1
-      stat -c '%U:%G:%a' /tmp/template1
+      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/tpl-defaults
+      cat /tmp/tpl-defaults
+      stat -c '%U:%G:%a' /tmp/tpl-defaults
     exit-status: 0
     stdout:
       - '/^Hello World$/'
@@ -79,10 +79,27 @@ command:
     exec: |
       set -euo pipefail
       export TEST="Goodbye World"
-      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template -o nobody:root -m 0600 - /tmp/template2
-      cat /tmp/template2
-      stat -c '%U:%G:%a' /tmp/template2
+      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template -o nobody:root -m 0600 - /tmp/tpl-custom
+      cat /tmp/tpl-custom
+      stat -c '%U:%G:%a' /tmp/tpl-custom
     exit-status: 0
     stdout:
       - '/^Goodbye World$/'
       - '/^nobody:root:600$/'
+
+  scp-template/multiple:
+    exec: |
+      set -euo pipefail
+      export TEST="Goodbye World"
+      echo '{{"{{"}} .Env.TEST {{"}}"}}' > /tmp/tpl-multi-in
+      scp template -o nobody:root -m 0600 /tmp/tpl-multi-in /tmp/tpl-multi-1 /tmp/tpl-multi-in /tmp/tpl-multi-2
+      grep -H . /tmp/tpl-multi-1
+      grep -H . /tmp/tpl-multi-2
+      stat -c '%n:%U:%G:%a' /tmp/tpl-multi-1
+      stat -c '%n:%U:%G:%a' /tmp/tpl-multi-2
+    exit-status: 0
+    stdout:
+      - '/^\/tmp\/tpl-multi-1:Goodbye World$/'
+      - '/^\/tmp\/tpl-multi-2:Goodbye World$/'
+      - '/^\/tmp\/tpl-multi-1:nobody:root:600$/'
+      - '/^\/tmp\/tpl-multi-2:nobody:root:600$/'

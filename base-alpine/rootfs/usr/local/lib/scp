@@ -117,25 +117,33 @@ scp_template() {
     done
     shift $((OPTIND -1))
 
-    # Determine source and target file from additional arguments
-    _source="${1}"
-    _target="${2}"
+    # Loop over all source and target files, given as argument pairs
+    while [ $# -ge 2 ]; do
+        # Read argument pair as source and target
+        _source="${1}"; shift
+        _target="${1}"; shift
 
-    # Skip if file already exists and replace has not been enabled
-    if [ "${_replace}" = "no" ] && [ -f "${_target}" ]; then
-        scp_info "scp-template: skip generation of [%s] from [%s], file already exists" \
-            "${_target}" "${_source}"
-        return 0
-    fi
+        # Skip if file already exists and replace has not been enabled
+        if [ "${_replace}" = "no" ] && [ -f "${_target}" ]; then
+            scp_info "scp-template: skip generation of [%s] from [%s], file already exists" \
+                "${_target}" "${_source}"
+            return 0
+        fi
 
-    # Execute gomplate using collected options
-    scp_info "scp-template: creating [%s] from [%s] with mode [%s]" \
-        "${_target}" "${_source}" "${_mode}"
-    gomplate --chmod "${_mode}" --file "${_source}" --out "${_target}"
-    
-    # Enforce correct ownership if requested
-    if [ -n "${_owner}" ]; then
-        scp_info "scp-template: changing ownership of [%s] to [%s]" "${_target}" "${_owner}"
-        chown "${_owner}" "${_target}"
+        # Execute gomplate using collected options
+        scp_info "scp-template: creating [%s] from [%s] with mode [%s]" \
+            "${_target}" "${_source}" "${_mode}"
+        gomplate --chmod "${_mode}" --file "${_source}" --out "${_target}"
+        
+        # Enforce correct ownership if requested
+        if [ -n "${_owner}" ]; then
+            scp_info "scp-template: changing ownership of [%s] to [%s]" "${_target}" "${_owner}"
+            chown "${_owner}" "${_target}"
+        fi
+    done
+
+    # Verify no arguments are left
+    if [ $# -ne 0 ]; then
+        scp_fatal "scp-template: unused argument(s) [%s], must be pairs of source and target file" "${*}"
     fi
 }
