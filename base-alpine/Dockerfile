@@ -5,6 +5,7 @@ RUN true \
     # Install runtime dependencies
     && apk add --no-cache --virtual .base \
     ca-certificates \
+    gomplate \
     libcap \
     su-exec \
     && true

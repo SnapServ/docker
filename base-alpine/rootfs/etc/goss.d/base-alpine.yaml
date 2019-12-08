@@ -12,52 +12,77 @@ file:
     group: 'root'
 
 command:
-  scp/log/debug:
+  scp-log/debug:
     exec: 'scp debug "Hello %s" "World"'
     exit-status: 0
     stdout:
       - '/\bDEBUG\s*: Hello World$/'
 
-  scp/log/info:
+  scp-log/info:
     exec: 'scp info "Hello %s" "World"'
     exit-status: 0
     stdout:
       - '/\bINFO\s*: Hello World$/'
 
-  scp/log/warn:
+  scp-log/warn:
     exec: 'scp warn "Hello %s" "World"'
     exit-status: 0
     stdout:
       - '/\bWARN\s*: Hello World$/'
 
-  scp/log/error:
+  scp-log/error:
     exec: 'scp error "Hello %s" "World"'
     exit-status: 0
     stdout:
       - '/\bERROR\s*: Hello World$/'
 
-  scp/log/fatal:
+  scp-log/fatal:
     exec: 'scp fatal "Hello %s" "World"'
     exit-status: 1
     stdout:
       - '/\bFATAL\s*: Hello World$/'
 
-  scp/runas/root:
+  scp-runas/root:
     exec: 'scp runas root whoami'
     exit-status: 0
     stdout:
       - '/^root$/'
 
-  scp/runas/nobody:
+  scp-runas/nobody:
     exec: 'scp runas nobody whoami'
     exit-status: 0
     stdout:
       - '/^nobody$/'
 
-  scp/prepare-dir:
+  scp-prepare-dir:
     exec: |
-      scp prepare-dir /tmp/test nobody:root 1775
-      stat -c '%U:%G:%a' /tmp/test
+      set -euo pipefail
+      scp prepare-dir /tmp/testdir nobody:root 1775
+      stat -c '%U:%G:%a' /tmp/testdir
     exit-status: 0
     stdout:
       - '/^nobody:root:1775$/'
+
+  scp-template/defaults:
+    exec: |
+      set -euo pipefail
+      export TEST="Hello World"
+      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/template1
+      cat /tmp/template1
+      stat -c '%U:%G:%a' /tmp/template1
+    exit-status: 0
+    stdout:
+      - '/^Hello World$/'
+      - '/^root:root:640$/'   
+
+  scp-template/custom:
+    exec: |
+      set -euo pipefail
+      export TEST="Goodbye World"
+      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template -o nobody:root -m 0600 - /tmp/template2
+      cat /tmp/template2
+      stat -c '%U:%G:%a' /tmp/template2
+    exit-status: 0
+    stdout:
+      - '/^Goodbye World$/'
+      - '/^nobody:root:600$/'
