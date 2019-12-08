@@ -130,6 +130,9 @@ scp_template() {
             return 0
         fi
 
+        # Create directory for target if missing
+        mkdir -p "$(dirname "${_target}")"
+
         # Execute gomplate using collected options
         scp_info "scp-template: creating [%s] from [%s] with mode [%s]" \
             "${_target}" "${_source}" "${_mode}"

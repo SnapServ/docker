@@ -73,7 +73,19 @@ command:
     exit-status: 0
     stdout:
       - '/^Hello World$/'
-      - '/^root:root:640$/'   
+      - '/^root:root:640$/'
+
+  scp-template/subdir:
+    exec: |
+      set -euo pipefail
+      export TEST="Hello World"
+      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/subdir/tpl
+      cat /tmp/subdir/tpl
+      stat -c '%U:%G:%a' /tmp/subdir/tpl
+    exit-status: 0
+    stdout:
+      - '/^Hello World$/'
+      - '/^root:root:640$/'
 
   scp-template/custom:
     exec: |
