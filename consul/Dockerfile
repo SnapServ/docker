@@ -1,4 +1,4 @@
-FROM quay.io/snapserv/base-alpine:1.0.5@sha256:db1eef0252b868acb67634a4321c0225fa8415bdd997bf5457d5acffca6d4826
+FROM quay.io/snapserv/base-alpine:1.0.7@sha256:c70085949b4792b67d79ee4408002ac90d644b7f59a38208b1e3b02aa129e45d
 
 ENV CONSUL_VERSION=1.6.2
 
