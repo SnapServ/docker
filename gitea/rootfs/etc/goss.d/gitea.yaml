@@ -1,0 +1,24 @@
+process:
+  gitea:
+    running: true
+
+port:
+  tcp6:2222:
+    listening: true
+    ip: ['::']
+
+  tcp6:3000:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/gitea/data:
+    exists: true
+    mode: '0700'
+    owner: 'gitea'
+    group: 'gitea'
+    filetype: 'directory'
+
+http:
+  http://localhost:3000/:
+    status: 200
