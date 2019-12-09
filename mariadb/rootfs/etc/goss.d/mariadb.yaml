@@ -1,0 +1,35 @@
+process:
+  mysqld:
+    running: true
+
+port:
+  tcp6:3306:
+    listening: true
+    ip: ['::']
+
+file:
+  /tmp/mariadb: &file-mariadb-runtime
+    exists: true
+    mode: '0700'
+    owner: 'mariadb'
+    group: 'mariadb'
+    filetype: 'directory'
+
+  /run/mariadb: *file-mariadb-runtime
+
+  /cts/mariadb/data:
+    <<: *file-mariadb-runtime
+    mode: '0750'
+
+command:
+  healthcheck/socket-auth:
+    exec: 'mysqladmin status'
+    exit-status: 0
+
+  healthcheck/root-account:
+    exec: 'mysqladmin status --user="root" --password="goss-insecure-root"'
+    exit-status: 0
+
+  healthcheck/user-account:
+    exec: 'mysqladmin status --user="goss" --password="goss-insecure-user"'
+    exit-status: 0
