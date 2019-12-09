@@ -1,4 +1,4 @@
-FROM quay.io/snapserv/base-alpine:1.0.7
+FROM quay.io/snapserv/base-alpine:1.0.7@sha256:c70085949b4792b67d79ee4408002ac90d644b7f59a38208b1e3b02aa129e45d
 
 ENV MARIADB_UID=1000 \
     MARIADB_GID=1000
