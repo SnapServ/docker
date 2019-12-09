@@ -150,3 +150,23 @@ scp_template() {
         scp_fatal "scp-template: unused argument(s) [%s], must be pairs of source and target file" "${*}"
     fi
 }
+
+scp_secret() {
+    local _ref_direct="${1}"
+    local _ref_file="${_ref_direct}_FILE"
+    local _file _direct
+
+    # Access direct and file secret variables by reference
+    _direct="$(eval "echo \${${_ref_direct}:-}")"
+    _file="$(eval "echo \${${_ref_file}:-}")"
+
+    # Read secret from file or output direct variable contents
+    if [ -n "${_file}" ]; then
+        if ! cat "${_file}"; then
+            scp_fatal "scp-secret: could not read secret [%s] from file [%s]" \
+                "${_ref_direct}" "${_file}"
+        fi
+    else
+        echo "${_direct}"
+    fi
+}

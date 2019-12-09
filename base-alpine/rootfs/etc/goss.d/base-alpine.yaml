@@ -115,3 +115,22 @@ command:
       - '/^\/tmp\/tpl-multi-2:Goodbye World$/'
       - '/^\/tmp\/tpl-multi-1:nobody:root:600$/'
       - '/^\/tmp\/tpl-multi-2:nobody:root:600$/'
+
+  scp-secret/direct:
+    exec: |
+      set -euo pipefail
+      export MY_SECRET="Top Secret"
+      scp secret "MY_SECRET"
+    exit-status: 0
+    stdout:
+      - '/^Top Secret$/'
+
+  scp-secret/file:
+    exec: |
+      set -euo pipefail
+      echo "Top Secret File" > /tmp/topsecret
+      export MY_SECRET_FILE="/tmp/topsecret"
+      scp secret "MY_SECRET"
+    exit-status: 0
+    stdout:
+      - '/^Top Secret File$/'
