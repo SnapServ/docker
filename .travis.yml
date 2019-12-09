@@ -6,7 +6,7 @@ services:
   - docker
 
 before_install:
-  - curl -fsSL https://goss.rocks/install | sudo sh
+  - curl -fsSL https://goss.rocks/install | sudo GOSS_VER=v0.3.8 sh
 
 script:
   - export COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-}"
