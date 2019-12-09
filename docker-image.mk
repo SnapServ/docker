@@ -22,7 +22,7 @@ DOCKER_BUILD_FLAGS ?=
 
 GOSS_FILES_PATH := ../
 GOSS_FILES_STRATEGY := mount
-GOSS_OPTS := --color --retry-timeout 30s --sleep 1s
+GOSS_OPTS := --color --retry-timeout 60s --sleep 1s
 
 # Check if working directory is dirty
 GIT_CLEAN_REPO_CHECK := $(strip $(shell git status --porcelain))
