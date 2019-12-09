@@ -4,8 +4,8 @@ set -euo pipefail
 . /usr/local/lib/scp
 
 if [ "${GOSS:-}" = "yes" ]; then
-    GITEA_SECRET_KEY="${GITEA_SECRET_KEY:-goss-insecure-do-not-use}"
-    export GITEA_SECRET_KEY
+    scp_warn "Using insecure secret key for test environment [GOSS=yes]"
+    export GITEA_SECRET_KEY="${GITEA_SECRET_KEY:-goss-insecure}"
 fi
 
 scp_prepare_dir "/cts/gitea/data" "gitea:gitea" "0700"
