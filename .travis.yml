@@ -1,13 +1,14 @@
-dist: bionic
-language: minimal
-sudo: required
+dist: 'bionic'
+language: 'minimal'
+sudo: 'required'
 
 services:
-  - docker
+  - 'docker'
 
 before_install:
-  - curl -fsSL https://goss.rocks/install | sudo GOSS_VER=v0.3.8 sh
+  - 'curl -fsSL https://goss.rocks/install | sudo GOSS_VER=v0.3.8 sh'
 
 script:
-  - export COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-}"
-  - make auto
+  - 'export COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-}"'
+  - 'echo "Travis CI - Commit Range: ${COMMIT_RANGE}"'
+  - 'make auto'
