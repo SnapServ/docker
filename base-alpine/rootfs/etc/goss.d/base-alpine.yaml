@@ -59,6 +59,7 @@ command:
       set -euo pipefail
       scp prepare-dir /tmp/testdir nobody:root 1775
       stat -c '%U:%G:%a' /tmp/testdir
+      rmdir /tmp/testdir
     exit-status: 0
     stdout:
       - '/^nobody:root:1775$/'
@@ -70,6 +71,7 @@ command:
       echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/tpl-defaults
       cat /tmp/tpl-defaults
       stat -c '%U:%G:%a' /tmp/tpl-defaults
+      rm /tmp/tpl-defaults
     exit-status: 0
     stdout:
       - '/^Hello World$/'
@@ -82,6 +84,7 @@ command:
       echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/subdir/tpl
       cat /tmp/subdir/tpl
       stat -c '%U:%G:%a' /tmp/subdir/tpl
+      rm /tmp/subdir/tpl
     exit-status: 0
     stdout:
       - '/^Hello World$/'
@@ -94,6 +97,7 @@ command:
       echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template -o nobody:root -m 0600 - /tmp/tpl-custom
       cat /tmp/tpl-custom
       stat -c '%U:%G:%a' /tmp/tpl-custom
+      rm /tmp/tpl-custom
     exit-status: 0
     stdout:
       - '/^Goodbye World$/'
@@ -109,6 +113,7 @@ command:
       grep -H . /tmp/tpl-multi-2
       stat -c '%n:%U:%G:%a' /tmp/tpl-multi-1
       stat -c '%n:%U:%G:%a' /tmp/tpl-multi-2
+      rm /tmp/tpl-multi-in /tmp/tpl-multi-1 /tmp/tpl-multi-2
     exit-status: 0
     stdout:
       - '/^\/tmp\/tpl-multi-1:Goodbye World$/'
@@ -131,6 +136,7 @@ command:
       echo "Top Secret File" > /tmp/topsecret
       export MY_SECRET_FILE="/tmp/topsecret"
       scp secret "MY_SECRET"
+      rm /tmp/topsecret
     exit-status: 0
     stdout:
       - '/^Top Secret File$/'
