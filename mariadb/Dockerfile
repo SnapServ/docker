@@ -6,7 +6,6 @@ ENV MARIADB_UID=1000 \
 RUN true \
     # Install required packages
     && apk add --no-cache \
-    git \
     mariadb \
     mariadb-client \
     tzdata \
