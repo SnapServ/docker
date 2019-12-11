@@ -8,6 +8,7 @@ RUN true \
     gomplate \
     libcap \
     su-exec \
+    tzdata \
     && true
 
 COPY rootfs /
