@@ -33,7 +33,7 @@ endif
 
 # Mark as release if current commit matches build tag commit (skip in debug)
 GIT_TAG_COMMIT := $(strip $(shell git rev-list "$(BUILD_TAG)" --max-count=1 2>&-))
-ifeq ($(DEBUG),)
+ifneq ($(RELEASE_CHECK),)
 ifeq ($(GIT_COMMIT),$(GIT_TAG_COMMIT))
 $(info release build: current commit [$(GIT_COMMIT)] matches tag commit [$(GIT_TAG_COMMIT)])
 RELEASE_GOAL_CHECK := yes
@@ -42,7 +42,7 @@ $(info test build: current commit [$(GIT_COMMIT)] does not match tag commit [$(G
 RELEASE_GOAL_CHECK := no
 endif
 else
-$(info test build: forced for commit [$(GIT_COMMIT)] due to DEBUG variable being set)
+$(info test build: forced for commit [$(GIT_COMMIT)] due to RELEASE_CHECK being unset)
 RELEASE_GOAL_CHECK := no
 endif
 

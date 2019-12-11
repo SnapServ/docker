@@ -9,6 +9,7 @@ before_install:
   - 'curl -fsSL https://goss.rocks/install | sudo GOSS_VER=v0.3.8 sh'
 
 script:
+  - 'export RELEASE_CHECK="yes"'
   - 'export COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-}"'
   - 'echo "Travis CI - Commit Range: ${COMMIT_RANGE}"'
   - 'make auto'
