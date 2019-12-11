@@ -1,13 +1,20 @@
 # Build list of possible targets and goals by scanning the directory
 IMAGE_TARGETS := $(sort $(dir $(wildcard */Dockerfile)))
+IMAGE_TARGETS_NTS := $(IMAGE_TARGETS:%/=%)
 IMAGE_GOALS := $(strip $(shell sed -En 's/.PHONY: (.*)/\1/p' docker-image.mk | tail -n1))
 IMAGE_GOALS := $(addprefix @,$(filter-out auto,$(IMAGE_GOALS)))
 
 # Extract active targets and goals from make goals
-ACTIVE_TARGETS := $(filter $(IMAGE_TARGETS),$(MAKECMDGOALS))
+ACTIVE_GOALS := $(filter @%,$(MAKECMDGOALS))
+ACTIVE_TARGETS := $(filter-out $(ACTIVE_GOALS),$(MAKECMDGOALS))
 ACTIVE_TARGETS := $(if $(ACTIVE_TARGETS),$(ACTIVE_TARGETS),$(IMAGE_TARGETS))
-ACTIVE_GOALS := $(filter-out $(IMAGE_TARGETS),$(MAKECMDGOALS))
-ACTIVE_GOALS := $(subst @,,$(filter $(IMAGE_GOALS),$(ACTIVE_GOALS)))
+ACTIVE_GOALS := $(ACTIVE_GOALS:@%=%)
+
+# Debug information about active goals and targets
+$(info Supported Goals: $(IMAGE_GOALS))
+$(info Supported Targets: $(IMAGE_TARGETS))
+$(info Active Goals: $(ACTIVE_GOALS))
+$(info Active Targets: $(ACTIVE_TARGETS))
 
 # Check if commit range to detect changes for automatic builds
 ifdef COMMIT_RANGE
@@ -45,4 +52,7 @@ $(IMAGE_TARGETS):
 
 	$(MAKE) -f ../docker-image.mk -C $@ $(ACTIVE_GOALS)
 
-.PHONY: all auto $(IMAGE_GOALS) $(IMAGE_TARGETS)
+# Support image targets without trailing slash
+$(IMAGE_TARGETS_NTS): $(addsuffix /,$(filter-out %/,$(ACTIVE_TARGETS)))
+
+.PHONY: all auto $(IMAGE_GOALS) $(IMAGE_TARGETS) $(IMAGE_TARGETS_NTS)
