@@ -9,7 +9,7 @@ scp_log() {
     _level="${1}"; shift
     _message="$(printf "${@}")"
     _timestamp="$(date -Iseconds)"
-    
+
     printf '[%s] %-5s: %s\n' "${_timestamp}" "${_level}" "${_message}"
 }
 
@@ -93,7 +93,7 @@ scp_relocate() {
     mkdir -p "${_new_path}"
     chown "${_old_owner}" "${_new_path}"
     chmod "${_old_mode}" "${_new_path}"
-    
+
     rm -Rf "${_old_path}"
     ln -sf "${_new_path}" "${_old_path}"
 }
@@ -137,7 +137,7 @@ scp_template() {
         scp_info "scp-template: creating [%s] from [%s] with mode [%s]" \
             "${_target}" "${_source}" "${_mode}"
         gomplate --chmod "${_mode}" --file "${_source}" --out "${_target}"
-        
+
         # Enforce correct ownership if requested
         if [ -n "${_owner}" ]; then
             scp_info "scp-template: changing ownership of [%s] to [%s]" "${_target}" "${_owner}"

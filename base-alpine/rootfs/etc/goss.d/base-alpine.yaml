@@ -27,19 +27,19 @@ command:
   scp-log/warn:
     exec: 'scp warn "Hello %s" "World"'
     exit-status: 0
-    stdout:
+    stderr:
       - '/\bWARN\s*: Hello World$/'
 
   scp-log/error:
     exec: 'scp error "Hello %s" "World"'
     exit-status: 0
-    stdout:
+    stderr:
       - '/\bERROR\s*: Hello World$/'
 
   scp-log/fatal:
     exec: 'scp fatal "Hello %s" "World"'
     exit-status: 1
-    stdout:
+    stderr:
       - '/\bFATAL\s*: Hello World$/'
 
   scp-runas/root:
