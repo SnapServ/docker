@@ -10,6 +10,9 @@ if [ "${GOSS:-}" = "yes" ]; then
     MARIADB_USER_PASSWORD="goss-insecure-user"
 fi
 
+MARIADB_ROOT_PASSWORD="$(scp_secret "MARIADB_ROOT_PASSWORD")"
+MARIADB_USER_PASSWORD="$(scp_secret "MARIADB_USER_PASSWORD")"
+
 mariadb_prepare_data_dir() {
     scp_info "preparing data directories..."
     (
