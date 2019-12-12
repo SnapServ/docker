@@ -2,11 +2,13 @@
 IMAGE_TARGETS := $(sort $(dir $(wildcard */Dockerfile)))
 IMAGE_TARGETS_NTS := $(IMAGE_TARGETS:%/=%)
 IMAGE_GOALS := $(strip $(shell sed -En 's/.PHONY: (.*)/\1/p' docker-image.mk | tail -n1))
-IMAGE_GOALS := $(addprefix @,$(filter-out auto,$(IMAGE_GOALS)))
+IMAGE_GOALS := $(addprefix @,$(filter-out all auto,$(IMAGE_GOALS)))
 
 # Extract active targets and goals from make goals
 ACTIVE_GOALS := $(filter @%,$(MAKECMDGOALS))
+ACTIVE_GOALS := $(filter @auto $(IMAGE_GOALS),$(ACTIVE_GOALS))
 ACTIVE_TARGETS := $(filter-out $(ACTIVE_GOALS),$(MAKECMDGOALS))
+ACTIVE_TARGETS := $(filter $(IMAGE_TARGETS) $(IMAGE_TARGETS_NTS),$(ACTIVE_TARGETS))
 ACTIVE_TARGETS := $(if $(ACTIVE_TARGETS),$(ACTIVE_TARGETS),$(IMAGE_TARGETS))
 ACTIVE_GOALS := $(ACTIVE_GOALS:@%=%)
 
@@ -36,10 +38,10 @@ CHANGED_IMAGES_FALLBACK := $(IMAGE_TARGETS)
 endif
 
 # Build all images unconditionally
-all: $(IMAGE_TARGETS)
+@all: $(IMAGE_TARGETS)
 
 # Auto-detect changes and only build when necessary
-auto: $(CHANGED_IMAGES) $(CHANGED_IMAGES_FALLBACK)
+@auto: $(CHANGED_IMAGES) $(CHANGED_IMAGES_FALLBACK)
 	$(info Changed Images: $(CHANGED_IMAGES))
 
 # Execute goal on all active targets
@@ -55,4 +57,4 @@ $(IMAGE_TARGETS):
 # Support image targets without trailing slash
 $(IMAGE_TARGETS_NTS): $(addsuffix /,$(filter-out %/,$(ACTIVE_TARGETS)))
 
-.PHONY: all auto $(IMAGE_GOALS) $(IMAGE_TARGETS) $(IMAGE_TARGETS_NTS)
+.PHONY: all @auto $(IMAGE_GOALS) $(IMAGE_TARGETS) $(IMAGE_TARGETS_NTS)
