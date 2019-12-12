@@ -22,15 +22,15 @@ scp_info() {
 }
 
 scp_warn() {
-    scp_log "WARN" "${@}"
+    scp_log "WARN" "${@}" >&2
 }
 
 scp_error() {
-    scp_log "ERROR" "${@}"
+    scp_log "ERROR" "${@}" >&2
 }
 
 scp_fatal() {
-    scp_log "FATAL" "${@}"
+    scp_log "FATAL" "${@}" >&2
     exit 1
 }
 
