@@ -1,0 +1,12 @@
+process:
+  oauth2-proxy:
+    running: true
+
+port:
+  tcp6:4180:
+    listening: true
+    ip: ['::']
+
+http:
+  http://localhost:4180/ping:
+    status: 200
