@@ -7,11 +7,11 @@ RUN true \
     && true
 
 WORKDIR /src
-COPY scp/go.mod scp/go.sum /src/
+COPY ctutil/go.mod ctutil/go.sum /src/
 RUN go mod download
 
-COPY scp .
-RUN go build -ldflags="-s -w" -o /bin/scp .
+COPY ctutil .
+RUN go build -ldflags="-s -w" -o /bin/ctutil .
 
 FROM alpine:3.11.2@sha256:3983cc12fb9dc20a009340149e382a18de6a8261b0ac0e8f5fcdf11f8dd5937e
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
@@ -56,11 +56,11 @@ RUN true \
     /var/spool/cron \
     && true
 
-COPY --from=builder /bin/scp /usr/local/bin/scp
+COPY --from=builder /bin/ctutil /usr/local/bin/ctutil
 COPY rootfs /
 
 RUN true \
     # Relocate /var/run and /var/tmp to /run and /tmp
-    && scp relocate /var/run /run \
-    && scp relocate /var/tmp /tmp \
+    && ctutil relocate /var/run /run \
+    && ctutil relocate /var/tmp /tmp \
     && true

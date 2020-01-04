@@ -1,4 +1,4 @@
-module scp
+module ctutil
 
 go 1.13
 
