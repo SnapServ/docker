@@ -35,6 +35,8 @@ CHANGED_IMAGES := $(sort $(TAGGED_TARGETS) $(COMMITTED_TARGETS))
 # If no changed images were found, build all of them
 ifeq ($(CHANGED_IMAGES),)
 CHANGED_IMAGES_FALLBACK := $(IMAGE_TARGETS)
+else
+$(info Changed Images: $(CHANGED_IMAGES))
 endif
 
 # Build all images unconditionally
@@ -42,7 +44,6 @@ endif
 
 # Auto-detect changes and only build when necessary
 @auto: $(CHANGED_IMAGES) $(CHANGED_IMAGES_FALLBACK)
-	$(info Changed Images: $(CHANGED_IMAGES))
 
 # Execute goal on all active targets
 $(IMAGE_GOALS): $(ACTIVE_TARGETS)
