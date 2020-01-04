@@ -10,83 +10,83 @@ command:
     exec: 'scp log "Hello, the %s is %d" "answer" 42'
     exit-status: 0
     stderr:
-      - '/\bHello, the answer is 42$/'
+      - '/( |$)Hello, the answer is 42$/'
 
   scp-exec/default:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       scp exec id
     exit-status: 0
     stdout:
-      - '/__SKIP__|uid=0\(root\) gid=0\(root\)/'
+      - '/^__SKIP__$|(^| )uid=0\(root\) gid=0\(root\)( |$)/'
 
   scp-exec/user:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       scp exec -p nobody id
     exit-status: 0
     stdout:
-      - '/__SKIP__|uid=65534\(nobody\) gid=65534\(nobody\)/'
+      - '/^__SKIP__$|(^| )uid=65534\(nobody\) gid=65534\(nobody\)( |$)/'
 
   scp-exec/user-and-group:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       scp exec -p nobody:nogroup id
     exit-status: 0
     stdout:
-      - '/__SKIP__|uid=65534\(nobody\) gid=65533\(nogroup\)/'
+      - '/^__SKIP__$|(^| )uid=65534\(nobody\) gid=65533\(nogroup\)( |$)/'
 
   scp-exec/uid:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       scp exec -p 4201 id
     exit-status: 0
     stdout:
-      - '/__SKIP__|uid=4201 gid=0(root)/'
+      - '/^__SKIP__$|(^| )uid=4201( |$)/'
 
   scp-exec/gid:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       scp exec -p :4202 id
     exit-status: 0
     stdout:
-      - '/__SKIP__|uid=0\(root\) gid=4202/'
+      - '/^__SKIP__$|(^| )gid=4202( |$)/'
 
   scp-exec/uid-and-gid:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       scp exec -p 4201:4202 id
     exit-status: 0
     stdout:
-      - '/__SKIP__|uid=4201 gid=4202/'
+      - '/^__SKIP__$|(^| )uid=4201 gid=4202( |$)/'
 
   scp-directory/default:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       rm -rf /tmp/scp-dir-1
       scp directory /tmp/scp-dir-1
       stat -c '%U:%G:%a' /tmp/scp-dir-1
     exit-status: 0
     stdout:
-      - '/^(__SKIP__|root:root:755)$/'
+      - '/^__SKIP__$|(^| )root:root:755( |$)/'
 
   scp-directory/custom:
     exec: |
       set -euo pipefail
-      [ "$(id -u):$(id -g)" != "0:0" ] && echo "__SKIP__" && exit 0
+      if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
       rm -rf /tmp/scp-dir-2
       scp directory -u nobody -g nogroup -m 1750 /tmp/scp-dir-2
       stat -c '%U:%G:%a' /tmp/scp-dir-2
     exit-status: 0
     stdout:
-      - '/^(__SKIP__|nobody:nogroup:1750)$/'
+      - '/^__SKIP__$|(^| )nobody:nogroup:1750( |$)/'
 
   scp-secret/direct:
     exec: |
