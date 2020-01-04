@@ -5,121 +5,68 @@ file:
     owner: 'root'
     group: 'root'
 
-  /usr/local/lib/scp:
-    exists: true
-    mode: '0644'
-    owner: 'root'
-    group: 'root'
-
 command:
-  scp-log/debug:
-    exec: 'scp debug "Hello %s" "World"'
-    exit-status: 0
-    stdout:
-      - '/\bDEBUG\s*: Hello World$/'
-
-  scp-log/info:
-    exec: 'scp info "Hello %s" "World"'
-    exit-status: 0
-    stdout:
-      - '/\bINFO\s*: Hello World$/'
-
-  scp-log/warn:
-    exec: 'scp warn "Hello %s" "World"'
+  scp-log:
+    exec: 'scp log "Hello, the %s is %d" "answer" 42'
     exit-status: 0
     stderr:
-      - '/\bWARN\s*: Hello World$/'
+      - '/\bHello, the answer is 42$/'
 
-  scp-log/error:
-    exec: 'scp error "Hello %s" "World"'
-    exit-status: 0
-    stderr:
-      - '/\bERROR\s*: Hello World$/'
-
-  scp-log/fatal:
-    exec: 'scp fatal "Hello %s" "World"'
-    exit-status: 1
-    stderr:
-      - '/\bFATAL\s*: Hello World$/'
-
-  scp-runas/root:
-    exec: 'scp runas root whoami'
+  scp-exec/default:
+    exec: 'scp exec id'
     exit-status: 0
     stdout:
-      - '/^root$/'
+      - 'uid=0(root) gid=0(root) groups=0(root)'
 
-  scp-runas/nobody:
-    exec: 'scp runas nobody whoami'
+  scp-exec/user:
+    exec: 'scp exec -p nobody id'
     exit-status: 0
     stdout:
-      - '/^nobody$/'
+      - 'uid=65534(nobody) gid=65534(nobody)'
 
-  scp-prepare-dir:
+  scp-exec/user-and-group:
+    exec: 'scp exec -p nobody:nogroup id'
+    exit-status: 0
+    stdout:
+      - 'uid=65534(nobody) gid=65533(nogroup)'
+
+  scp-exec/uid:
+    exec: 'scp exec -p 4201 id'
+    exit-status: 0
+    stdout:
+      - 'uid=4201 gid=0(root)'
+
+  scp-exec/gid:
+    exec: 'scp exec -p :4202 id'
+    exit-status: 0
+    stdout:
+      - 'uid=0(root) gid=4202'
+
+  scp-exec/uid-and-gid:
+    exec: 'scp exec -p 4201:4202 id'
+    exit-status: 0
+    stdout:
+      - 'uid=4201 gid=4202'
+
+  scp-directory/default:
     exec: |
       set -euo pipefail
-      scp prepare-dir /tmp/testdir nobody:root 1775
-      stat -c '%U:%G:%a' /tmp/testdir
-      rmdir /tmp/testdir
+      rm -rf /tmp/testdir1
+      scp directory /tmp/testdir1
+      stat -c '%U:%G:%a' /tmp/testdir1
     exit-status: 0
     stdout:
-      - '/^nobody:root:1775$/'
+      - '/^root:root:755$/'
 
-  scp-template/defaults:
+  scp-directory/custom:
     exec: |
       set -euo pipefail
-      export TEST="Hello World"
-      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/tpl-defaults
-      cat /tmp/tpl-defaults
-      stat -c '%U:%G:%a' /tmp/tpl-defaults
-      rm /tmp/tpl-defaults
+      rm -rf /tmp/testdir2
+      scp directory -u nobody -g nogroup -m 1750 /tmp/testdir2
+      stat -c '%U:%G:%a' /tmp/testdir2
     exit-status: 0
     stdout:
-      - '/^Hello World$/'
-      - '/^root:root:640$/'
-
-  scp-template/subdir:
-    exec: |
-      set -euo pipefail
-      export TEST="Hello World"
-      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/subdir/tpl
-      cat /tmp/subdir/tpl
-      stat -c '%U:%G:%a' /tmp/subdir/tpl
-      rm /tmp/subdir/tpl
-    exit-status: 0
-    stdout:
-      - '/^Hello World$/'
-      - '/^root:root:640$/'
-
-  scp-template/custom:
-    exec: |
-      set -euo pipefail
-      export TEST="Goodbye World"
-      echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template -o nobody:root -m 0600 - /tmp/tpl-custom
-      cat /tmp/tpl-custom
-      stat -c '%U:%G:%a' /tmp/tpl-custom
-      rm /tmp/tpl-custom
-    exit-status: 0
-    stdout:
-      - '/^Goodbye World$/'
-      - '/^nobody:root:600$/'
-
-  scp-template/multiple:
-    exec: |
-      set -euo pipefail
-      export TEST="Goodbye World"
-      echo '{{"{{"}} .Env.TEST {{"}}"}}' > /tmp/tpl-multi-in
-      scp template -o nobody:root -m 0600 /tmp/tpl-multi-in /tmp/tpl-multi-1 /tmp/tpl-multi-in /tmp/tpl-multi-2
-      grep -H . /tmp/tpl-multi-1
-      grep -H . /tmp/tpl-multi-2
-      stat -c '%n:%U:%G:%a' /tmp/tpl-multi-1
-      stat -c '%n:%U:%G:%a' /tmp/tpl-multi-2
-      rm /tmp/tpl-multi-in /tmp/tpl-multi-1 /tmp/tpl-multi-2
-    exit-status: 0
-    stdout:
-      - '/^\/tmp\/tpl-multi-1:Goodbye World$/'
-      - '/^\/tmp\/tpl-multi-2:Goodbye World$/'
-      - '/^\/tmp\/tpl-multi-1:nobody:root:600$/'
-      - '/^\/tmp\/tpl-multi-2:nobody:root:600$/'
+      - '/^nobody:nogroup:1750$/'
 
   scp-secret/direct:
     exec: |
@@ -133,10 +80,68 @@ command:
   scp-secret/file:
     exec: |
       set -euo pipefail
-      echo "Top Secret File" > /tmp/topsecret
+      echo -n "Top Secret File" > /tmp/topsecret
       export MY_SECRET_FILE="/tmp/topsecret"
       scp secret "MY_SECRET"
       rm /tmp/topsecret
     exit-status: 0
     stdout:
       - '/^Top Secret File$/'
+
+  # scp-template/defaults:
+  #   exec: |
+  #     set -euo pipefail
+  #     export TEST="Hello World"
+  #     echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/tpl-defaults
+  #     cat /tmp/tpl-defaults
+  #     stat -c '%U:%G:%a' /tmp/tpl-defaults
+  #     rm /tmp/tpl-defaults
+  #   exit-status: 0
+  #   stdout:
+  #     - '/^Hello World$/'
+  #     - '/^root:root:640$/'
+
+  # scp-template/subdir:
+  #   exec: |
+  #     set -euo pipefail
+  #     export TEST="Hello World"
+  #     echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template - /tmp/subdir/tpl
+  #     cat /tmp/subdir/tpl
+  #     stat -c '%U:%G:%a' /tmp/subdir/tpl
+  #     rm /tmp/subdir/tpl
+  #   exit-status: 0
+  #   stdout:
+  #     - '/^Hello World$/'
+  #     - '/^root:root:640$/'
+
+  # scp-template/custom:
+  #   exec: |
+  #     set -euo pipefail
+  #     export TEST="Goodbye World"
+  #     echo '{{"{{"}} .Env.TEST {{"}}"}}' | scp template -o nobody:root -m 0600 - /tmp/tpl-custom
+  #     cat /tmp/tpl-custom
+  #     stat -c '%U:%G:%a' /tmp/tpl-custom
+  #     rm /tmp/tpl-custom
+  #   exit-status: 0
+  #   stdout:
+  #     - '/^Goodbye World$/'
+  #     - '/^nobody:root:600$/'
+
+  # scp-template/multiple:
+  #   exec: |
+  #     set -euo pipefail
+  #     export TEST="Goodbye World"
+  #     echo '{{"{{"}} .Env.TEST {{"}}"}}' > /tmp/tpl-multi-in
+  #     scp template -o nobody:root -m 0600 /tmp/tpl-multi-in /tmp/tpl-multi-1 /tmp/tpl-multi-in /tmp/tpl-multi-2
+  #     grep -H . /tmp/tpl-multi-1
+  #     grep -H . /tmp/tpl-multi-2
+  #     stat -c '%n:%U:%G:%a' /tmp/tpl-multi-1
+  #     stat -c '%n:%U:%G:%a' /tmp/tpl-multi-2
+  #     rm /tmp/tpl-multi-in /tmp/tpl-multi-1 /tmp/tpl-multi-2
+  #   exit-status: 0
+  #   stdout:
+  #     - '/^\/tmp\/tpl-multi-1:Goodbye World$/'
+  #     - '/^\/tmp\/tpl-multi-2:Goodbye World$/'
+  #     - '/^\/tmp\/tpl-multi-1:nobody:root:600$/'
+  #     - '/^\/tmp\/tpl-multi-2:nobody:root:600$/'
+
