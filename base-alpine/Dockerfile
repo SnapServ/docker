@@ -11,7 +11,7 @@ COPY scp/go.mod scp/go.sum /src/
 RUN go mod download
 
 COPY scp .
-RUN go build -o /bin/scp .
+RUN go build -ldflags="-s -w" -o /bin/scp .
 
 FROM alpine:3.11.2@sha256:3983cc12fb9dc20a009340149e382a18de6a8261b0ac0e8f5fcdf11f8dd5937e
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
