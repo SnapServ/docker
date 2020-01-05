@@ -3,15 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"syscall"
 )
 
 type DirectoryCmd struct {
-	Path  string `kong:"required,arg,help='Path to directory'"`
-	Mode  string `kong:"optional,default=0755,short=m,help='Ensure directory has given octal mode'"`
-	User  string `kong:"optional,short=u,help='Ensure directory is owned by user id'"`
-	Group string `kong:"optional,short=g,help='Ensure directory is owned by group id'"`
+	Path    string `kong:"required,arg,help='Path to directory'"`
+	Mode    string `kong:"optional,default=0755,short=m,help='Ensure directory has given octal mode'"`
+	User    string `kong:"optional,short=u,help='Ensure directory is owned by user id'"`
+	Group   string `kong:"optional,short=g,help='Ensure directory is owned by group id'"`
+	Parents bool   `kong:"optional,default=true,short=p,help='Create missing parent directories'"`
 }
 
 func (c *DirectoryCmd) Run() error {
@@ -20,7 +22,18 @@ func (c *DirectoryCmd) Run() error {
 		return fmt.Errorf("could not parse mode [%s] as octal: %w", c.Mode, err)
 	}
 
-	if err := os.MkdirAll(c.Path, os.FileMode(mode)); err != nil {
+	if c.Parents {
+		parentPath := filepath.Dir(c.Path)
+		if _, err := os.Stat(parentPath); os.IsNotExist(err) {
+			parentCmd := *c
+			parentCmd.Path = parentPath
+			if err := parentCmd.Run(); err != nil {
+				return err
+			}
+		}
+	}
+
+	if err := os.Mkdir(c.Path, os.FileMode(mode)); err != nil {
 		return fmt.Errorf("could not create directory [%s] recursively: %w", c.Path, err)
 	}
 
