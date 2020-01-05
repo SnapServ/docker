@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/opencontainers/runc/libcontainer/user"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -86,4 +88,13 @@ func sanitizeEnvName(name string) string {
 	name = strings.ToUpper(strings.ReplaceAll(name, "-", "_"))
 	name = reEnvName.ReplaceAllString(name, "")
 	return name
+}
+
+func enrichExitErr(err error) error {
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		return fmt.Errorf("%w: %s", exitErr, exitErr.Stderr)
+	}
+
+	return err
 }
