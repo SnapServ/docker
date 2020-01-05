@@ -60,6 +60,8 @@ COPY --from=builder /bin/ctutil /usr/local/bin/ctutil
 COPY rootfs /
 
 RUN true \
+    # Prepare common directory for persistent storage
+    && ctutil directory -u root -g root -m 0755 /cts \
     # Relocate /var/run and /var/tmp to /run and /tmp
     && ctutil relocate /var/run /run \
     && ctutil relocate /var/tmp /tmp \
