@@ -20,9 +20,16 @@ DOCKER_LABEL_URL := https://snapserv.net
 DOCKER_LABEL_VCS_URL := https://github.com/snapserv/infrastructure
 DOCKER_BUILD_FLAGS ?=
 
+# Declare options for goss testing
 GOSS_FILES_PATH := ../
 GOSS_FILES_STRATEGY := mount
 GOSS_OPTS := --color --retry-timeout 60s --sleep 1s
+
+# Use environment variables from goss.env during testing if present
+GOSS_ENV_FILE := goss.env
+ifeq (,$(wildcard $(GOSS_ENV_FILE)))
+GOSS_ENV_FILE := /dev/null
+endif
 
 # Check if working directory is dirty
 GIT_CLEAN_REPO_CHECK := $(strip $(shell git status --porcelain))
@@ -105,8 +112,9 @@ goss: build
 	$(eval export GOSS_FILES_STRATEGY)
 	$(eval export GOSS_OPTS)
 
-	# Run dgoss for testing docker images without goss
-	dgoss run -it --rm -e GOSS=yes \
+	# Run dgoss for testing docker images
+	dgoss run -it --rm \
+		--env-file "$(GOSS_ENV_FILE)" \
 		--read-only --tmpfs /run --tmpfs /tmp \
 		"$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)"
 
