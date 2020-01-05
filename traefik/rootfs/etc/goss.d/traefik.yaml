@@ -8,7 +8,7 @@ port:
     ip: ['::']
 
 file:
-  /cts/traefik/data:
+  /cts/traefik:
     exists: true
     mode: '0700'
     owner: 'traefik'

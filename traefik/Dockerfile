@@ -1,21 +1,17 @@
 FROM traefik:v2.1.1@sha256:b1fe8eec6330ffe542f313a21860361f266375f854804ed19893933f65a62e67 AS traefik
-FROM quay.io/snapserv/base-alpine:1.0.9@sha256:e80dfe9b9999d72ddf8aed7b3a460dc1ed97485f8bfd6c5bcc3871f07a26af99
+FROM quay.io/snapserv/base-alpine:1.1.0@sha256:fa5c177e40e14e84fcdb92c3f94fa1bc41177e83d01fd4eb5c5f120ded13f0cb
 
 RUN true \
-    # Add service account
-    && addgroup -S traefik \
-    && adduser -S -s /bin/false -G traefik traefik \
-    # Prepare persistent directories
-    && mkdir -p /cts/traefik/config /cts/traefik/data \
-    && chown traefik:traefik /cts/traefik/config /cts/traefik/data \
-    && chmod 0700 /cts/traefik/config /cts/traefik/data \
+    && ctutil account -u 2000 -g 2000 traefik \
+    && ctutil directory -u traefik -g traefik -m 0700 /cts/traefik \
     && true
 
 COPY --from=traefik /usr/local/bin/traefik /usr/local/bin/traefik
-
 COPY rootfs /
-RUN chmod 0755 /docker-entrypoint.sh
 
-EXPOSE 8080/tcp 8081/tcp 8443/tcp
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
-VOLUME [ "/cts/traefik/config", "/cts/traefik/data" ]
+USER traefik
+EXPOSE 8081/tcp
+VOLUME [ "/cts/traefik" ]
+
+ENTRYPOINT [ "/usr/local/bin/traefik" ]
+CMD [ "--api.insecure=true", "--ping=true", "--entrypoints.traefik.address=:8081" ]
