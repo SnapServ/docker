@@ -17,7 +17,7 @@ DOCKER_IMAGE_PATH := quay.io/snapserv/$(DOCKER_IMAGE_NAME)
 DOCKER_IMAGE_TAG := $(BUILD_VERSION)-$(GIT_COMMIT_DATE)-$(GIT_COMMIT_SHORT)
 DOCKER_LABEL_VENDOR := SnapServ
 DOCKER_LABEL_URL := https://snapserv.net
-DOCKER_LABEL_VCS_URL := https://github.com/snapserv/docker
+DOCKER_LABEL_VCS_URL := https://github.com/snapserv/infrastructure
 DOCKER_BUILD_FLAGS ?=
 
 GOSS_FILES_PATH := ../
