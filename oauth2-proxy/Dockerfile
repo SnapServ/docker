@@ -10,5 +10,6 @@ COPY rootfs /
 
 USER oauth2-proxy
 EXPOSE 4180/tcp
+
 ENTRYPOINT [ "/usr/local/bin/oauth2-proxy" ]
 CMD [ "-http-address=[::]:4180", "-ping-path=/ping", "-silence-ping-logging" ]
