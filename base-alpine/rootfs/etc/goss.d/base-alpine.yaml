@@ -107,3 +107,18 @@ command:
     exit-status: 0
     stdout:
       - '/^Top Secret File$/'
+
+  ctutil-template:
+    exec: |
+      set -euo pipefail
+      echo "{{ "{{" }} .Env.TEMPLATE_TEST {{ "}}" }}" > /tmp/ctutil-tpl.in
+      export TEMPLATE_TEST="Hello World"
+      ctutil template /tmp/ctutil-tpl.in=
+      export TEMPLATE_TEST="Goodbye World"
+      ctutil template /tmp/ctutil-tpl.in=/tmp/ctutil-tpl.out
+      cat /tmp/ctutil-tpl.out
+      rm /tmp/ctutil-tpl.in /tmp/ctutil-tpl.out
+    exit-status: 0
+    stdout:
+      - '/^Hello World$/'
+      - '/^Goodbye World$/'

@@ -13,6 +13,7 @@ var cli struct {
 	Log       LogCmd       `kong:"cmd,help='Print a log message with optional format arguments'"`
 	Relocate  RelocateCmd  `kong:"cmd,help='Relocate a directory from an old to a new path and add a symlink'"`
 	Secret    SecretCmd    `kong:"cmd,help='Read secret from environment, either directly or from file'"`
+	Template  TemplateCmd  `kong:"cmd,help='Generate configuration file based on Go template'"`
 }
 
 func main() {
