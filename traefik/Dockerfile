@@ -3,7 +3,7 @@ FROM quay.io/snapserv/base-alpine:1.1.0@sha256:fa5c177e40e14e84fcdb92c3f94fa1bc4
 
 RUN true \
     && ctutil account -u 2000 -g 2000 traefik \
-    && ctutil directory -u traefik -g traefik -m 0700 /cts/traefik \
+    && ctutil directory -u traefik -g traefik -m 0700 /cts/traefik/persistent \
     && true
 
 COPY --from=traefik /usr/local/bin/traefik /usr/local/bin/traefik
@@ -11,7 +11,7 @@ COPY rootfs /
 
 USER traefik
 EXPOSE 8081/tcp
-VOLUME [ "/cts/traefik" ]
+VOLUME [ "/cts/traefik/persistent" ]
 
 ENTRYPOINT [ "/usr/local/bin/traefik" ]
 CMD [ "--api.insecure=true", "--ping=true", "--entrypoints.traefik.address=:8081" ]
