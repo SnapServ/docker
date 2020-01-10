@@ -1,22 +1,23 @@
-FROM quay.io/snapserv/base-alpine:1.0.9@sha256:e80dfe9b9999d72ddf8aed7b3a460dc1ed97485f8bfd6c5bcc3871f07a26af99
-
-ENV MARIADB_UID=1000 \
-    MARIADB_GID=1000
+FROM quay.io/snapserv/base-alpine:1.1.2@sha256:a90e71856f4cc2839fdbbbb4fba7572dcf184432d3a480ee64df8c80440d8c30
 
 RUN true \
-    # Install required packages
+    # Install MariaDB
     && apk add --no-cache \
     mariadb \
     mariadb-client \
-    tzdata \
-    # Add service account
-    && addgroup -S -g "${MARIADB_GID}" mariadb \
-    && adduser -S -s /bin/false -G mariadb -u "${MARIADB_UID}" mariadb \
+    # Prepare container runtime environment
+    && ctutil account -u 2000 -g 2000 mariadb \
+    && ctutil directory -u mariadb -g mariadb -m 0700 \
+        /cts/mariadb/persistent/data \
+        /cts/mariadb/volatile/run \
+        /cts/mariadb/volatile/tmp \
     && true
 
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
+USER mariadb
 EXPOSE 3306/tcp
+VOLUME [ "/cts/mariadb/persistent", "/cts/mariadb/volatile" ]
+
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
-VOLUME [ "/cts/mariadb/data" ]

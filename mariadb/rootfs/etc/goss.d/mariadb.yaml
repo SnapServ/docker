@@ -8,18 +8,18 @@ port:
     ip: ['::']
 
 file:
-  /tmp/mariadb: &file-mariadb-runtime
+  /cts/mariadb: &file-mariadb-dir
     exists: true
     mode: '0700'
     owner: 'mariadb'
     group: 'mariadb'
     filetype: 'directory'
 
-  /run/mariadb: *file-mariadb-runtime
-
-  /cts/mariadb/data:
-    <<: *file-mariadb-runtime
-    mode: '0750'
+  /cts/mariadb/persistent: *file-mariadb-dir
+  /cts/mariadb/persistent/data: *file-mariadb-dir
+  /cts/mariadb/volatile: *file-mariadb-dir
+  /cts/mariadb/volatile/run: *file-mariadb-dir
+  /cts/mariadb/volatile/tmp: *file-mariadb-dir
 
 command:
   healthcheck/socket-auth:
@@ -27,9 +27,9 @@ command:
     exit-status: 0
 
   healthcheck/root-account:
-    exec: 'mysqladmin status --user="root" --password="goss-insecure-root"'
+    exec: 'mysqladmin status --user="root" --password="goss-root-insecure"'
     exit-status: 0
 
   healthcheck/user-account:
-    exec: 'mysqladmin status --user="goss" --password="goss-insecure-user"'
+    exec: 'mysqladmin status --user="goss-user" --password="goss-user-insecure"'
     exit-status: 0

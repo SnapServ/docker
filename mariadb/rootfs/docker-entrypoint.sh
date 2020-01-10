@@ -1,23 +1,16 @@
 #!/bin/sh
 #shellcheck shell=ash
 set -euo pipefail
-. /usr/local/lib/scp
 
-if [ "${GOSS:-}" = "yes" ]; then
-    scp_warn "Using insecure credentials for test environment [GOSS=yes]"
-    MARIADB_ROOT_PASSWORD="goss-insecure-root"
-    MARIADB_USER_ACCOUNT="goss"
-    MARIADB_USER_PASSWORD="goss-insecure-user"
-fi
-
-MARIADB_ROOT_PASSWORD="$(scp_secret "MARIADB_ROOT_PASSWORD")"
-MARIADB_USER_PASSWORD="$(scp_secret "MARIADB_USER_PASSWORD")"
+MARIADB_ROOT_PASSWORD="$(ctutil secret "MARIADB_ROOT_PASSWORD")"
+MARIADB_USER_PASSWORD="$(ctutil secret "MARIADB_USER_PASSWORD")"
 
 mariadb_prepare_data_dir() {
-    scp_info "preparing data directories..."
+    ctutil log "preparing data directories..."
     (
-        scp_runas "mariadb" mysql_install_db \
+        ctutil run -p mariadb -- mysql_install_db \
             --rpm \
+            --auth-root-socket-user="mariadb" \
             --auth-root-authentication-method="socket"
     )
 }
@@ -30,58 +23,63 @@ mariadb_server_start() {
     local _attempt
 
     # Start temporary server process in background
-    scp_info "starting temporary database server..."
+    ctutil log "starting temporary database server..."
     (
-        scp_runas "mariadb" mysqld --skip-networking
+        ctutil run -p mariadb -- mysqld --skip-networking
     ) &
 
     # Attempt to connect to database up to 30 times
     for _attempt in $(seq 1 30); do
-        scp_info "waiting for database to be ready... [attempt %d of 30]" "${_attempt}"
+        ctutil log "waiting for database to be ready... [attempt %d of 30]" "${_attempt}"
         if echo "SELECT 1" | mariadb_query >/dev/null 2>&1; then
-            scp_info "successfully started temporary database server"
+            ctutil log "successfully started temporary database server"
             return
         fi
         sleep 1
     done
 
     # Connection to database has failed, abort
-    scp_error "could not start temporary database server, attempting to stop..."
+    ctutil log "could not start temporary database server, attempting to stop..."
     mariadb_server_stop || true
-    scp_fatal "now exiting due to startup failure"
+    ctutil log "now exiting due to startup failure"
+    exit 1
 }
 
 mariadb_initial_setup() {
     # Import timezone data into database
-    scp_info "importing timezone data into database..."
+    ctutil log "importing timezone data into database..."
     if mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb_query --database="mysql"; then
-        scp_info "successfully imported timezone data into mariadb"
+        ctutil log "successfully imported timezone data into mariadb"
     else
-        scp_fatal "could not import timezone data into mariadb"
+        ctutil log "could not import timezone data into mariadb"
+        exit 1
     fi
 
     # Remove insecure defaults from database
     if mariadb_secure_defaults; then
-        scp_info "removed insecure defaults from database"
+        ctutil log "removed insecure defaults from database"
     else
-        scp_fatal "could not remove insecure defaults from database"
+        ctutil log "could not remove insecure defaults from database"
+        exit 1
     fi
 
     # Create root account if configured
     if [ -n "${MARIADB_ROOT_PASSWORD:-}" ]; then
         if mariadb_create_root "${MARIADB_ROOT_PASSWORD}"; then
-            scp_info "created root account with password authentication"
+            ctutil log "created root account with password authentication"
         else
-            scp_fatal "could not create root account with password authentication"
+            ctutil log "could not create root account with password authentication"
+            exit 1
         fi
     fi
 
     # Create user and database pair if configured
     if [ -n "${MARIADB_USER_ACCOUNT:-}" ] && [ -n "${MARIADB_USER_PASSWORD}" ]; then
         if mariadb_create_user "${MARIADB_USER_ACCOUNT}" "${MARIADB_USER_PASSWORD}"; then
-            scp_info "created user and database pair [%s]" "${MARIADB_USER_ACCOUNT}"
+            ctutil log "created user and database pair [%s]" "${MARIADB_USER_ACCOUNT}"
         else
-            scp_fatal "could not create user and database pair [%s]" "${MARIADB_USER_ACCOUNT}"
+            ctutil log "could not create user and database pair [%s]" "${MARIADB_USER_ACCOUNT}"
+            exit 1
         fi
     fi
 }
@@ -89,7 +87,7 @@ mariadb_initial_setup() {
 mariadb_secure_defaults() {
     mariadb_query <<-EOQ
     SET @@SESSION.SQL_LOG_BIN=0;
-    DELETE FROM mysql.user WHERE user NOT IN ('root') OR host NOT IN ('localhost');
+    DELETE FROM mysql.user WHERE user NOT IN ('mariadb') OR host NOT IN ('localhost');
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';
     FLUSH PRIVILEGES;
@@ -119,29 +117,26 @@ EOQ
 
 mariadb_server_stop() {
     if mysqladmin shutdown; then
-        scp_info "successfully stopped temporary database server"
+        ctutil log "successfully stopped temporary database server"
     else
-        scp_fatal "could not stop temporary database server"
+        ctutil log "could not stop temporary database server"
+        exit 1
     fi
 }
 
-scp_prepare_dir "/cts/mariadb/data" "mariadb:mariadb" "0750"
-scp_prepare_dir "/run/mariadb" "mariadb:mariadb" "0700"
-scp_prepare_dir "/tmp/mariadb" "mariadb:mariadb" "0700"
-
 if [ $# -ge 1 ]; then
-    scp_runas "mariadb" "${@}"
+    exec ctutil run -p mariadb -- "${@}"
 fi
 
-if [ ! -d "/cts/mariadb/data/mysql" ]; then
-    scp_info "no data directory found, initializing database..."
+if [ ! -d "/cts/mariadb/persistent/data/mysql" ]; then
+    ctutil log "no data directory found, initializing database..."
     mariadb_prepare_data_dir
     mariadb_server_start
     mariadb_initial_setup
     mariadb_server_stop
-    scp_info "successfully initialized mariadb, starting server..."
+    ctutil log "successfully initialized mariadb, starting server..."
 else
-    scp_info "starting server with existing data directory..."
+    ctutil log "starting server with existing data directory..."
 fi
 
-scp_runas "mariadb" mysqld
+exec ctutil run -p mariadb -- mysqld
