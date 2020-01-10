@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"os"
+	"reflect"
+	"strconv"
 	"strings"
+	"text/template"
 )
 
 type TemplateContext struct{}
@@ -20,7 +22,11 @@ func (c *TemplateCmd) Run() error {
 		"contains": c.contains,
 		"default":  c.defaultValue,
 		"env":      c.envValue,
-	})
+		"quote":    c.quote,
+		"split":    c.split,
+		"ternary":  c.ternary,
+		"toBool":   c.toBool,
+	}).Option("missingkey=error")
 
 	if len(c.Delimiters) == 2 {
 		tmpl.Delims(c.Delimiters[0], c.Delimiters[1])
@@ -87,6 +93,53 @@ func (c *TemplateCmd) envValue(key, defaultValue string) string {
 	}
 
 	return defaultValue
+}
+
+func (c *TemplateCmd) quote(value string) string {
+	return fmt.Sprintf("%q", value)
+}
+
+func (c *TemplateCmd) ternary(trueValue, falseValue, condition interface{}) interface{} {
+	if truth, ok := template.IsTrue(condition); truth && ok {
+		return trueValue
+	}
+
+	return falseValue
+}
+
+func (c *TemplateCmd) split(separator, value string) []string {
+	result := strings.Split(value, separator)
+	if len(result) == 1 && result[0] == "" {
+		return []string{}
+	}
+
+	return result
+}
+
+func (c *TemplateCmd) toBool(value interface{}) bool {
+	if b, ok := value.(bool); ok {
+		return b
+	}
+
+	if s, ok := value.(string); ok {
+		if b, err := strconv.ParseBool(s); err == nil {
+			return b
+		} else {
+			return false
+		}
+	}
+
+	refValue := reflect.Indirect(reflect.ValueOf(value))
+	switch refValue.Kind() {
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
+		return refValue.Int() == 1
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
+		return refValue.Uint() == 1
+	case reflect.Float32, reflect.Float64:
+		return refValue.Float() == 1
+	}
+
+	return false
 }
 
 func (c *TemplateContext) Env() map[string]string {
