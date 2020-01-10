@@ -1,26 +1,27 @@
-FROM quay.io/snapserv/base-alpine:1.0.9@sha256:e80dfe9b9999d72ddf8aed7b3a460dc1ed97485f8bfd6c5bcc3871f07a26af99
+FROM quay.io/snapserv/base-alpine:1.1.2@sha256:a90e71856f4cc2839fdbbbb4fba7572dcf184432d3a480ee64df8c80440d8c30
 
 RUN true \
-    # Install required packages
-    && apk add --no-cache \
-    nginx \
-    # Add system accounts and groups
-    && adduser -h /var/www/html -S -s /bin/false -G www-data www-data \
-    && addgroup nginx tty \
-    && addgroup www-data tty \
-    # Remove default configuration files
+    # Install nginx and remove unused defaults
+    && apk add --no-cache nginx==1.16.1-r4 \
     && rm /etc/nginx/conf.d/default.conf \
+    # Prepare container runtime environment
+    && ctutil account -u 2000 -g 2000 www-data \
+    && ctutil directory -u www-data -g www-data -m 0700 \
+        /cts/nginx/log \
+        /cts/nginx/run \
+        /cts/nginx/tmp \
+    # Adjust and relink default paths
+    && ctutil directory -u www-data -g www-data -m 0750 /var/lib/nginx \
+    && rm -f /var/lib/nginx/logs /var/lib/nginx/run \
+    && ln -sf /cts/nginx/log /var/lib/nginx/logs \
+    && ln -sf /cts/nginx/run /var/lib/nginx/run \
     && true
 
 COPY rootfs /
 
-RUN true \
-    # Mark entrypoint script as executable
-    && chmod 0755 /docker-entrypoint.sh \
-    # Relocate /var/lib/nginx/logs to tmp directory
-    # Only needed during startup, actual logging is stdout/stderr
-    && scp relocate /var/lib/nginx/logs /tmp/nginx \
-    && true
-
+USER www-data
 EXPOSE 8080/tcp
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
+VOLUME [ "/cts/nginx" ]
+
+ENTRYPOINT [ "/usr/sbin/nginx" ]
+CMD [ "-g", "daemon off;" ]

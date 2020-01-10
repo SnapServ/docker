@@ -16,14 +16,16 @@ port:
     ip: ['::']
 
 file:
-  /tmp/nginx: &file-nginx-dir
+  /cts/nginx: &file-nginx-dir
     exists: true
     mode: '0700'
-    owner: 'nginx'
-    group: 'nginx'
+    owner: 'www-data'
+    group: 'www-data'
     filetype: 'directory'
 
-  /run/nginx: *file-nginx-dir
+  /cts/nginx/log: *file-nginx-dir
+  /cts/nginx/run: *file-nginx-dir
+  /cts/nginx/tmp: *file-nginx-dir
 
 http:
   http://localhost:8080/nginx-health:
