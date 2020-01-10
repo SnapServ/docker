@@ -12,14 +12,17 @@ port:
     ip: ['::']
 
 file:
-  /tmp/hugo: &file-hugo-dir
+  /cts/hugo: &file-hugo-dir
     exists: true
     mode: '0700'
     owner: 'hugo'
     group: 'hugo'
     filetype: 'directory'
-  
-  /tmp/hugo-quickstart: *file-hugo-dir
+
+  /cts/hugo/persistent: *file-hugo-dir
+  /cts/hugo/persistent/data: *file-hugo-dir
+  /cts/hugo/volatile: *file-hugo-dir
+  /cts/hugo/volatile/tmp: *file-hugo-dir
 
 http:
   http://localhost:1313/:
