@@ -1,35 +1,35 @@
-APP_NAME = {{ getenv "GITEA_APP_NAME" "Gitea" }}
-RUN_MODE = {{ getenv "GITEA_RUN_MODE" "prod" }}
+APP_NAME = {{ env "GITEA_APP_NAME" "Gitea" }}
+RUN_MODE = {{ env "GITEA_RUN_MODE" "prod" }}
 
 [log]
 MODE = console
-ROOT_PATH = /cts/gitea/data/log
+ROOT_PATH = /cts/gitea/persistent/data/log
 
 [server]
-APP_DATA_PATH = /cts/gitea/data
-ROOT_URL = {{ getenv "GITEA_ROOT_URL" "" }}
+APP_DATA_PATH = /cts/gitea/persistent/data
+ROOT_URL = {{ env "GITEA_ROOT_URL" "" }}
 START_SSH_SERVER = true
 BUILTIN_SSH_SERVER_USER = git
-SSH_DOMAIN = {{ getenv "GITEA_SSH_DOMAIN" "localhost" }}
+SSH_DOMAIN = {{ env "GITEA_SSH_DOMAIN" "localhost" }}
 SSH_PORT = 2222
 HTTP_PORT = 3000
 LFS_START_SERVER = false
-LFS_CONTENT_PATH = /cts/gitea/data/lfs
+LFS_CONTENT_PATH = /cts/gitea/persistent/data/lfs
 
 [database]
-PATH = /cts/gitea/data/gitea.db
-DB_TYPE = {{ getenv "GITEA_DATABASE_TYPE" "sqlite3" }}
-HOST = {{ getenv "GITEA_DATABASE_HOST" "localhost:3306" }}
-NAME = {{ getenv "GITEA_DATABASE_NAME" "gitea" }}
-USER = {{ getenv "GITEA_DATABASE_USERNAME" "gitea" }}
-PASSWD = {{ getenv "GITEA_DATABASE_PASSWORD" "gitea" }}
+PATH = /cts/gitea/persistent/data/gitea.db
+DB_TYPE = {{ env "GITEA_DATABASE_TYPE" "sqlite3" }}
+HOST = {{ env "GITEA_DATABASE_HOST" "localhost:3306" }}
+NAME = {{ env "GITEA_DATABASE_NAME" "gitea" }}
+USER = {{ env "GITEA_DATABASE_USERNAME" "gitea" }}
+PASSWD = {{ env "GITEA_DATABASE_PASSWORD" "gitea" }}
 
 [service]
-DISABLE_REGISTRATION = {{ ternary "false" "true" (getenv "GITEA_REGISTRATION" "true") }}
-REQUIRE_SIGNIN_VIEW = {{ ternary "false" "true" (getenv "GITEA_ANONYMOUS" "true") }}
+DISABLE_REGISTRATION = {{ env "GITEA_REGISTRATION" "true" | toBool }}
+REQUIRE_SIGNIN_VIEW = {{ env "GITEA_ANONYMOUS" "true" | toBool }}
 
 [security]
-{{ if has .Env "GITEA_SECRET_KEY" }}
+{{ if contains .Env "GITEA_SECRET_KEY" }}
 INSTALL_LOCK = true
 SECRET_KEY = {{ .Env.GITEA_SECRET_KEY }}
 {{ else }}
@@ -37,24 +37,24 @@ INSTALL_LOCK = false
 {{ end }}
 
 [cache]
-ADAPTER = {{ getenv "GITEA_CACHE_ADAPTER" "memory" }}
-INTERVAL = {{ getenv "GITEA_CACHE_INTERVAL" "60" }}
-HOST = {{ getenv "GITEA_CACHE_HOST" "" }}
-ITEM_TTL = {{ getenv "GITEA_CACHE_ITEM_TTL" "16h" }}
+ADAPTER = {{ env "GITEA_CACHE_ADAPTER" "memory" }}
+INTERVAL = {{ env "GITEA_CACHE_INTERVAL" "60" }}
+HOST = {{ env "GITEA_CACHE_HOST" "" }}
+ITEM_TTL = {{ env "GITEA_CACHE_ITEM_TTL" "16h" }}
 
 [session]
-PROVIDER = {{ getenv "GITEA_SESSION_PROVIDER" "memory" }}
-PROVIDER_CONFIG = {{ getenv "GITEA_SESSION_PROVIDER_CONFIG" "/cts/gitea/data/sessions" }}
+PROVIDER = {{ env "GITEA_SESSION_PROVIDER" "memory" }}
+PROVIDER_CONFIG = {{ env "GITEA_SESSION_PROVIDER_CONFIG" "/cts/gitea/persistent/data/sessions" }}
 
 [repository]
-ROOT = /cts/gitea/data/repositories
+ROOT = /cts/gitea/persistent/data/repositories
 
 [indexer]
-ISSUE_INDEXER_PATH = /cts/gitea/data/indexers/issues.bleve
+ISSUE_INDEXER_PATH = /cts/gitea/persistent/data/indexers/issues.bleve
 
 [picture]
-AVATAR_UPLOAD_PATH = /cts/gitea/data/avatars
-REPOSITORY_AVATAR_UPLOAD_PATH = /cts/gitea/data/repo-avatars
+AVATAR_UPLOAD_PATH = /cts/gitea/persistent/data/avatars
+REPOSITORY_AVATAR_UPLOAD_PATH = /cts/gitea/persistent/data/repo-avatars
 
 [attachment]
-PATH = /cts/gitea/data/attachments
+PATH = /cts/gitea/persistent/data/attachments

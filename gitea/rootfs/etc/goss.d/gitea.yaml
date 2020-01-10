@@ -12,12 +12,16 @@ port:
     ip: ['::']
 
 file:
-  /cts/gitea/data:
+  /cts/gitea: &file-gitea-dir
     exists: true
     mode: '0700'
     owner: 'gitea'
     group: 'gitea'
     filetype: 'directory'
+
+  /cts/gitea/persistent: *file-gitea-dir
+  /cts/gitea/persistent/data: *file-gitea-dir
+  /cts/gitea/persistent/home: *file-gitea-dir
 
 http:
   http://localhost:3000/:
