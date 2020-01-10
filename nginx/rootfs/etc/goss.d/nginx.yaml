@@ -16,16 +16,16 @@ port:
     ip: ['::']
 
 file:
-  /cts/nginx: &file-nginx-dir
+  /cts/nginx/volatile: &file-nginx-dir
     exists: true
     mode: '0700'
     owner: 'www-data'
     group: 'www-data'
     filetype: 'directory'
 
-  /cts/nginx/log: *file-nginx-dir
-  /cts/nginx/run: *file-nginx-dir
-  /cts/nginx/tmp: *file-nginx-dir
+  /cts/nginx/volatile/log: *file-nginx-dir
+  /cts/nginx/volatile/run: *file-nginx-dir
+  /cts/nginx/volatile/tmp: *file-nginx-dir
 
 http:
   http://localhost:8080/nginx-health:
