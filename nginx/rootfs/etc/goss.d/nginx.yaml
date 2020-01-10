@@ -16,13 +16,14 @@ port:
     ip: ['::']
 
 file:
-  /cts/nginx/volatile: &file-nginx-dir
+  /cts/nginx: &file-nginx-dir
     exists: true
     mode: '0700'
     owner: 'www-data'
     group: 'www-data'
     filetype: 'directory'
 
+  /cts/nginx/volatile: *file-nginx-dir
   /cts/nginx/volatile/log: *file-nginx-dir
   /cts/nginx/volatile/run: *file-nginx-dir
   /cts/nginx/volatile/tmp: *file-nginx-dir
