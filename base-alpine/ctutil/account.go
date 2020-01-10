@@ -8,10 +8,11 @@ import (
 	"strings"
 )
 
-const baseHomePath = "/run/home"
+const baseHomePath = "/home"
 
 type AccountCmd struct {
 	Name string `kong:"required,arg,help='Desired account name'"`
+	Home string `kong:"optional,short=h,help='Path to home directory for user'"`
 	UID  int    `kong:"optional,short=u,default=-1,placeholder=UID,help='Force specific UID for account'"`
 	GID  int    `kong:"optional,short=g,default=-1,placeholder=GID,help='Force specific GID for account'"`
 }
@@ -21,7 +22,7 @@ func (c *AccountCmd) Run() error {
 		c.Name,
 		"-D", "-G", c.Name,
 		"-g", strings.ToTitle(c.Name) + " Service Account",
-		"-h", baseHomePath + "/" + c.Name,
+		"-h", c.Home,
 		"-s", "/sbin/nologin",
 	}
 	groupArgs := []string{
@@ -46,6 +47,11 @@ func (c *AccountCmd) Run() error {
 	if c.GID != -1 {
 		groupArgs = append(groupArgs, "-g", strconv.Itoa(c.GID))
 	}
+	if c.Home != "" {
+		userArgs = append(userArgs, "-h", c.Home)
+	} else {
+		userArgs = append(userArgs, "-h", baseHomePath+"/"+c.Name)
+	}
 
 	if _, err := exec.Command("addgroup", groupArgs...).Output(); err != nil {
 		return fmt.Errorf("call to addgroup failed: %w", enrichExitErr(err))
@@ -53,8 +59,11 @@ func (c *AccountCmd) Run() error {
 	if _, err := exec.Command("adduser", userArgs...).Output(); err != nil {
 		return fmt.Errorf("call to adduser failed: %w", enrichExitErr(err))
 	}
-	if err := c.setupHomeDirectory(); err != nil {
-		return err
+
+	if c.Home == "" {
+		if err := c.setupHomeDirectory(); err != nil {
+			return err
+		}
 	}
 
 	return nil
