@@ -16,12 +16,14 @@ port:
     ip: ['::']
 
 file:
-  /cts/acme-dns:
+  /cts/acme-dns: &file-acme-dns-dir
     exists: true
     mode: '0700'
     owner: 'acme-dns'
     group: 'acme-dns'
     filetype: 'directory'
+
+  /cts/acme-dns/volatile: *file-acme-dns-dir
 
 http:
   http://localhost:8080/health:
