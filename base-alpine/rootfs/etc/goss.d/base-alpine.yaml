@@ -12,56 +12,56 @@ command:
     stderr:
       - '/( |$)Hello, the answer is 42$/'
 
-  ctutil-exec/default:
+  ctutil-run/default:
     exec: |
       set -euo pipefail
       if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
-      ctutil exec id
+      ctutil run id
     exit-status: 0
     stdout:
       - '/^__SKIP__$|(^| )uid=0\(root\) gid=0\(root\)( |$)/'
 
-  ctutil-exec/user:
+  ctutil-run/user:
     exec: |
       set -euo pipefail
       if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
-      ctutil exec -p nobody id
+      ctutil run -p nobody id
     exit-status: 0
     stdout:
       - '/^__SKIP__$|(^| )uid=65534\(nobody\) gid=65534\(nobody\)( |$)/'
 
-  ctutil-exec/user-and-group:
+  ctutil-run/user-and-group:
     exec: |
       set -euo pipefail
       if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
-      ctutil exec -p nobody:nogroup id
+      ctutil run -p nobody:nogroup id
     exit-status: 0
     stdout:
       - '/^__SKIP__$|(^| )uid=65534\(nobody\) gid=65533\(nogroup\)( |$)/'
 
-  ctutil-exec/uid:
+  ctutil-run/uid:
     exec: |
       set -euo pipefail
       if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
-      ctutil exec -p 4201 id
+      ctutil run -p 4201 id
     exit-status: 0
     stdout:
       - '/^__SKIP__$|(^| )uid=4201( |$)/'
 
-  ctutil-exec/gid:
+  ctutil-run/gid:
     exec: |
       set -euo pipefail
       if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
-      ctutil exec -p :4202 id
+      ctutil run -p :4202 id
     exit-status: 0
     stdout:
       - '/^__SKIP__$|(^| )gid=4202( |$)/'
 
-  ctutil-exec/uid-and-gid:
+  ctutil-run/uid-and-gid:
     exec: |
       set -euo pipefail
       if [ "$(id -u):$(id -g)" != "0:0" ]; then echo "__SKIP__"; exit 0; fi
-      ctutil exec -p 4201:4202 id
+      ctutil run -p 4201:4202 id
     exit-status: 0
     stdout:
       - '/^__SKIP__$|(^| )uid=4201 gid=4202( |$)/'
