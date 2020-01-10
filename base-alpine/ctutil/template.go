@@ -35,7 +35,7 @@ func (c *TemplateCmd) Run() error {
 	}
 
 	for srcPath, dstPath := range c.Templates {
-		if err := c.generate(tmpl, srcPath, dstPath); err != nil {
+		if err := c.run(tmpl, srcPath, dstPath); err != nil {
 			return err
 		}
 	}
@@ -43,7 +43,7 @@ func (c *TemplateCmd) Run() error {
 	return nil
 }
 
-func (c *TemplateCmd) generate(tmpl *template.Template, srcPath, dstPath string) error {
+func (c *TemplateCmd) run(tmpl *template.Template, srcPath, dstPath string) error {
 	srcText, err := ioutil.ReadFile(srcPath)
 	if err != nil {
 		return fmt.Errorf("could not read template from [%s]: %w", srcPath, err)

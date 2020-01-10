@@ -9,6 +9,16 @@ import (
 	"strings"
 )
 
+func containsIntSlice(haystack, needle []int) bool {
+	for _, value := range needle {
+		if !containsInt(haystack, value) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func containsInt(haystack []int, needle int) bool {
 	for _, value := range haystack {
 		if value == needle {

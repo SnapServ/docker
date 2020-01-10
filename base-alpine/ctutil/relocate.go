@@ -15,7 +15,7 @@ type RelocateCmd struct {
 }
 
 func (c *RelocateCmd) Run() error {
-	// Ensure old path exists and gather information
+	// Ensure old path is symlink or exists and gather information
 	oldStat, err := os.Stat(c.OldPath)
 	if err != nil && os.IsNotExist(err) {
 		return fmt.Errorf("old path [%s] does not exist: %w", c.OldPath, err)

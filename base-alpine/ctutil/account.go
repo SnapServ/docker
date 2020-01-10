@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os/exec"
+	"os/user"
 	"strconv"
 	"strings"
 )
@@ -27,6 +28,18 @@ func (c *AccountCmd) Run() error {
 		c.Name,
 	}
 
+	if _, err := user.Lookup(c.Name); err == nil {
+		if _, err := exec.Command("deluser", c.Name).Output(); err != nil {
+			return fmt.Errorf("could not remove existing user: %w", enrichExitErr(err))
+		}
+	}
+
+	if _, err := user.LookupGroup(c.Name); err == nil {
+		if _, err := exec.Command("delgroup", c.Name).Output(); err != nil {
+			return fmt.Errorf("could not remove existing group: %w", enrichExitErr(err))
+		}
+	}
+
 	if c.UID != -1 {
 		userArgs = append(userArgs, "-u", strconv.Itoa(c.UID))
 	}
@@ -49,7 +62,7 @@ func (c *AccountCmd) Run() error {
 
 func (c *AccountCmd) setupHomeDirectory() error {
 	baseDirCmd := &DirectoryCmd{
-		Path:  baseHomePath,
+		Paths: []string{baseHomePath},
 		Mode:  "0755",
 		User:  "root",
 		Group: "root",
@@ -59,7 +72,7 @@ func (c *AccountCmd) setupHomeDirectory() error {
 	}
 
 	userDirCmd := &DirectoryCmd{
-		Path:  baseHomePath + "/" + c.Name,
+		Paths: []string{baseHomePath + "/" + c.Name},
 		Mode:  "0700",
 		User:  c.Name,
 		Group: c.Name,

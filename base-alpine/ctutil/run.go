@@ -10,14 +10,14 @@ import (
 	"github.com/opencontainers/runc/libcontainer/user"
 )
 
-type ExecCmd struct {
+type RunCmd struct {
 	Cmd        string   `kong:"required,arg,help='Name of executable to run, resolved using $PATH if relative'"`
 	CmdArgs    []string `kong:"optional,arg,help='Additional arguments for executable'"`
 	Privileges string   `kong:"optional,short=p,help='Drop privileges to given spec',placeholder='<USER|USER:GROUP|UID:GID>'"`
 	Groups     []int    `kong:"optional,short=g,help='Override supplemental groups when using -u',placeholder='SGID'"`
 }
 
-func (c *ExecCmd) Run() error {
+func (c *RunCmd) Run() error {
 	if c.Privileges != "" {
 		if err := c.dropPrivileges(); err != nil {
 			return err
@@ -37,14 +37,21 @@ func (c *ExecCmd) Run() error {
 	return nil
 }
 
-func (c *ExecCmd) dropPrivileges() error {
-	if err := os.Unsetenv("HOME"); err != nil {
-		return fmt.Errorf("could not unset HOME env variable: %w", err)
-	}
-
+func (c *RunCmd) dropPrivileges() error {
 	execUser, err := c.parsePrivileges()
 	if err != nil {
 		return err
+	}
+
+	groupIDs, err := os.Getgroups()
+	if err == nil &&
+		os.Getuid() == execUser.Uid && os.Getgid() == execUser.Gid &&
+		containsIntSlice(groupIDs, execUser.Sgids) {
+		return nil
+	}
+
+	if err := os.Unsetenv("HOME"); err != nil {
+		return fmt.Errorf("could not unset HOME env variable: %w", err)
 	}
 
 	if err := syscall.Setgroups(execUser.Sgids); err != nil {
@@ -66,7 +73,7 @@ func (c *ExecCmd) dropPrivileges() error {
 	return nil
 }
 
-func (c *ExecCmd) parsePrivileges() (*user.ExecUser, error) {
+func (c *RunCmd) parsePrivileges() (*user.ExecUser, error) {
 	defaultExecUser := &user.ExecUser{
 		Uid:  syscall.Getuid(),
 		Gid:  syscall.Getgid(),
