@@ -1,0 +1,28 @@
+process:
+  acme-dns:
+    running: true
+
+port:
+  tcp6:5353:
+    listening: true
+    ip: ['::']
+
+  udp6:5353:
+    listening: true
+    ip: ['::']
+
+  tcp6:8080:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/acme-dns:
+    exists: true
+    mode: '0700'
+    owner: 'acme-dns'
+    group: 'acme-dns'
+    filetype: 'directory'
+
+http:
+  http://localhost:8080/health:
+    status: 200

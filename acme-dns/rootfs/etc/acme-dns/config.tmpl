@@ -1,0 +1,28 @@
+[general]
+listen = "[::]:5353"
+protocol = "both"
+domain = {{ env "ACMEDNS_DOMAIN" "auth.example.com" | quote }}
+nsname = {{ env "ACMEDNS_NSNAME" "auth.example.com" | quote }}
+nsadmin = {{ env "ACMEDNS_NSADMIN" "admin.example.com" | quote }}
+records = [{{ range $record := (env "ACMEDNS_RECORDS" "" | split ",") }}
+    {{ $record | quote }},
+{{ end }}]
+
+[database]
+engine = {{ env "ACMEDNS_DB_ENGINE" "sqlite3" | quote }}
+connection = {{ env "ACMEDNS_DB_CONNECTION" "/cts/acme-dns/acme-dns.db" | quote }}
+
+[api]
+listen = "[::]"
+port = "8080"
+tls = "none"
+corsorigins = [{{ range $origin := (env "ACMEDNS_CORS_ORIGINS" "*" | split ",") }}
+    {{ $origin | quote }},
+{{ end }}]
+use_header = {{ env "ACMEDNS_USE_HEADER" "true" | toBool }}
+header_name = {{ env "ACMEDNS_HEADER_NAME" "X-Forwarded-For" | quote }}
+
+[logconfig]
+loglevel = {{ env "ACMEDNS_LOG_LEVEL" "info" | quote }}
+logtype = "stdout"
+logformat = "text"
