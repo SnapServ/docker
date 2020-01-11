@@ -1,4 +1,4 @@
-FROM quay.io/snapserv/base-alpine:1.1.2@sha256:a90e71856f4cc2839fdbbbb4fba7572dcf184432d3a480ee64df8c80440d8c30
+FROM quay.io/snapserv/base-alpine:1.1.3@sha256:5d12b847e8c3ffda75d72bf3d0e450330d194033e5794bd77f00c4e1823068e1
 
 RUN true \
     # Install Hugo
