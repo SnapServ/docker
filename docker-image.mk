@@ -5,7 +5,7 @@ endif
 
 # Detect latest Git tag for image
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-BUILD_TAG := $(strip $(shell git describe --abbrev=0 --match "$(DOCKER_IMAGE_NAME)/*" --tags 2>&- || echo "v0.0.0"))
+BUILD_TAG := $(strip $(shell git describe --abbrev=0 --match "$(DOCKER_IMAGE_NAME)/*" --tags 2>&- || echo "0.0.0"))
 BUILD_VERSION := $(subst $(DOCKER_IMAGE_NAME)/,,$(BUILD_TAG))
 GIT_COMMIT := $(strip $(shell git rev-parse HEAD))
 GIT_COMMIT_SHORT := $(strip $(shell git rev-parse --short HEAD))
