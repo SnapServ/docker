@@ -1,3 +1,6 @@
+# Logging function, muted when using the "s" flag when executing make
+log = $(if $(filter s,$(MAKEFLAGS)),,$(call info,$(1)))
+
 # Build list of possible targets and goals by scanning the directory
 IMAGE_TARGETS := $(sort $(dir $(wildcard */Dockerfile)))
 IMAGE_TARGETS_NTS := $(IMAGE_TARGETS:%/=%)
@@ -13,10 +16,10 @@ ACTIVE_TARGETS := $(if $(ACTIVE_TARGETS),$(ACTIVE_TARGETS),$(IMAGE_TARGETS))
 ACTIVE_GOALS := $(ACTIVE_GOALS:@%=%)
 
 # Debug information about active goals and targets
-$(info Supported Goals: $(IMAGE_GOALS))
-$(info Supported Targets: $(IMAGE_TARGETS))
-$(info Active Goals: $(ACTIVE_GOALS))
-$(info Active Targets: $(ACTIVE_TARGETS))
+$(call log,Supported Goals: $(IMAGE_GOALS))
+$(call log,Supported Targets: $(IMAGE_TARGETS))
+$(call log,Active Goals: $(ACTIVE_GOALS))
+$(call log,Active Targets: $(ACTIVE_TARGETS))
 
 # Check if commit range to detect changes for automatic builds
 ifdef COMMIT_RANGE
@@ -36,7 +39,7 @@ CHANGED_IMAGES := $(sort $(TAGGED_TARGETS) $(COMMITTED_TARGETS))
 ifeq ($(CHANGED_IMAGES),)
 CHANGED_IMAGES_FALLBACK := $(IMAGE_TARGETS)
 else
-$(info Changed Images: $(CHANGED_IMAGES))
+$(call log,Changed Images: $(CHANGED_IMAGES))
 endif
 
 # Build all images unconditionally

@@ -3,9 +3,18 @@ ifndef DOCKER_IMAGE_NAME
 $(error missing required variable: DOCKER_IMAGE_NAME)
 endif
 
+# Logging function, muted when using the "s" flag when executing make
+log = $(if $(filter s,$(MAKEFLAGS)),,$(call info,$(1)))
+
+# Escape codes for colored output
+cc_red=$(shell echo -e "\033[0;31m")
+cc_green=$(shell echo -e "\033[0;32m")
+cc_end=$(shell echo -e "\033[0m")
+
 # Detect latest Git tag for image
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-BUILD_TAG := $(strip $(shell git describe --abbrev=0 --match "$(DOCKER_IMAGE_NAME)/*" --tags 2>&- || echo "0.0.0"))
+BUILD_TAG := $(strip $(shell git describe --abbrev=0 --match "$(DOCKER_IMAGE_NAME)/*" --tags 2>&- || echo "$(DOCKER_IMAGE_NAME)/0.0.0"))
+BUILD_TAG_DATE := $(strip $(shell git log --max-count=1 --format='%aI' "$(BUILD_TAG)" 2>&- || echo "<n/a>"))
 BUILD_VERSION := $(subst $(DOCKER_IMAGE_NAME)/,,$(BUILD_TAG))
 GIT_COMMIT := $(strip $(shell git rev-parse HEAD))
 GIT_COMMIT_SHORT := $(strip $(shell git rev-parse --short HEAD))
@@ -45,14 +54,14 @@ endif
 GIT_TAG_COMMIT := $(strip $(shell git rev-list "$(BUILD_TAG)" --max-count=1 2>&-))
 ifneq ($(RELEASE_CHECK),)
 ifeq ($(GIT_COMMIT),$(GIT_TAG_COMMIT))
-$(info release build: current commit [$(GIT_COMMIT)] matches tag commit [$(GIT_TAG_COMMIT)])
+$(call log,release build: current commit [$(GIT_COMMIT)] matches tag commit [$(GIT_TAG_COMMIT)])
 RELEASE_GOAL_CHECK := yes
 else
-$(info test build: current commit [$(GIT_COMMIT)] does not match tag commit [$(GIT_TAG_COMMIT)])
+$(call log,test build: current commit [$(GIT_COMMIT)] does not match tag commit [$(GIT_TAG_COMMIT)])
 RELEASE_GOAL_CHECK := no
 endif
 else
-$(info test build: forced for commit [$(GIT_COMMIT)] due to RELEASE_CHECK being unset)
+$(call log,test build: forced for commit [$(GIT_COMMIT)] due to RELEASE_CHECK being unset)
 RELEASE_GOAL_CHECK := no
 endif
 
@@ -68,13 +77,13 @@ DOCKER_IMAGE_TAG := $(subst $(DOCKER_IMAGE_NAME)/,,$(BUILD_VERSION))
 endif
 
 # Print information about current build task
-$(info ============================== $(DOCKER_IMAGE_NAME) ==============================)
-$(info >> Build Identifier: $(BUILD_VERSION) @ $(BUILD_DATE))
-$(info >> Git Commit: $(GIT_COMMIT) @ $(GIT_COMMIT_DATE))
-$(info >> Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG))
-$(info >> Docker Image MRC: $(IMAGE_MRC_ID) (Tag: $(IMAGE_MRC_TAG)))
-$(info >> Flags: cleanRepo=$(GIT_CLEAN_REPO_CHECK) releaseGoal=$(RELEASE_GOAL_CHECK) upToDate=$(IMAGE_UPTODATE))
-$(info )
+$(call log,============================== $(DOCKER_IMAGE_NAME) ==============================)
+$(call log,>> Build Identifier: $(BUILD_VERSION) @ $(BUILD_DATE))
+$(call log,>> Git Commit: $(GIT_COMMIT) @ $(GIT_COMMIT_DATE))
+$(call log,>> Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG))
+$(call log,>> Docker Image MRC: $(IMAGE_MRC_ID) (Tag: $(IMAGE_MRC_TAG)))
+$(call log,>> Flags: cleanRepo=$(GIT_CLEAN_REPO_CHECK) releaseGoal=$(RELEASE_GOAL_CHECK) upToDate=$(IMAGE_UPTODATE))
+$(call log,)
 
 # Combined targets
 default: test
@@ -136,17 +145,22 @@ push: login
 output:
 	@echo Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)
 
-# Update image tag if not already most recent
-update:
+# Check if image is up-to-date
+check-update:
 ifneq ($(IMAGE_UPTODATE),yes)
-	@echo "Image $(DOCKER_IMAGE_NAME) is outdated with version $(BUILD_VERSION)"; \
-	echo "Changelog since latest release:"; \
+	@echo "$(cc_red)[NOK]$(cc_end) Image $(DOCKER_IMAGE_NAME) is outdated since $(BUILD_TAG_DATE) with version $(BUILD_VERSION)"
+else
+	@echo "$(cc_green)[OK]$(cc_end)  Image $(DOCKER_IMAGE_NAME) is up-to-date with version $(BUILD_VERSION)"
+endif
+
+# Update image tag if not already most recent
+update: check-update
+ifneq ($(IMAGE_UPTODATE),yes)
+	@echo "Changelog since latest release:"; \
 	git log --oneline "$(BUILD_TAG)..HEAD" ./; \
 	read -p "Please enter new version number: " _version; \
 	git tag "$(DOCKER_IMAGE_NAME)/$${_version}" "$(IMAGE_MRC_ID)"; \
 	echo "Tagged $(IMAGE_MRC_ID) as $(DOCKER_IMAGE_NAME)/$${_version}"
-else
-	@echo "Image $(DOCKER_IMAGE_NAME) is up-to-date with version $(BUILD_VERSION)"
 endif
 
-.PHONY: default release test build lint login push output update auto
+.PHONY: default release test build lint login push output update check-update auto
