@@ -157,7 +157,7 @@ endif
 update: check-update
 ifneq ($(IMAGE_UPTODATE),yes)
 	@echo "Changelog since latest release:"; \
-	git log --oneline "$(BUILD_TAG)..HEAD" ./; \
+	git log --oneline "$(BUILD_TAG)..HEAD" ./ 2>&-; \
 	read -p "Please enter new version number: " _version; \
 	git tag "$(DOCKER_IMAGE_NAME)/$${_version}" "$(IMAGE_MRC_ID)"; \
 	echo "Tagged $(IMAGE_MRC_ID) as $(DOCKER_IMAGE_NAME)/$${_version}"
