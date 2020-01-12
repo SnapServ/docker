@@ -10,7 +10,7 @@ records = [{{ range $record := (env "ACMEDNS_RECORDS" "" | split ",") }}
 
 [database]
 engine = {{ env "ACMEDNS_DB_ENGINE" "sqlite3" | quote }}
-connection = {{ env "ACMEDNS_DB_CONNECTION" "/cts/acme-dns/volatile/acme-dns.db" | quote }}
+connection = {{ env "ACMEDNS_DB_CONNECTION" "/cts/acme-dns/persistent/acme-dns.db" | quote }}
 
 [api]
 listen = "[::]"

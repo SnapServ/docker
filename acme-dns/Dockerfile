@@ -3,7 +3,7 @@ FROM quay.io/snapserv/base-alpine:1.1.4@sha256:f778e085ca5a9cdeba83b074161fb3ab6
 
 RUN true \
     && ctutil account -u 2000 -g 2000 acme-dns \
-    && ctutil directory -u acme-dns -g acme-dns -m 0700 /cts/acme-dns/volatile \
+    && ctutil directory -u acme-dns -g acme-dns -m 0700 /cts/acme-dns/persistent \
     && true
 
 COPY --from=acme-dns /root/acme-dns /usr/local/bin/acme-dns
@@ -12,6 +12,6 @@ RUN chmod 0755 /docker-entrypoint.sh
 
 USER acme-dns
 EXPOSE 5353/tcp 5353/udp 8080/tcp
-VOLUME [ "/cts/acme-dns/volatile" ]
+VOLUME [ "/cts/acme-dns/persistent" ]
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]

@@ -23,7 +23,7 @@ file:
     group: 'acme-dns'
     filetype: 'directory'
 
-  /cts/acme-dns/volatile: *file-acme-dns-dir
+  /cts/acme-dns/persistent: *file-acme-dns-dir
 
 http:
   http://localhost:8080/health:
