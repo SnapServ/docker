@@ -10,6 +10,9 @@ BUILD_VERSION := $(subst $(DOCKER_IMAGE_NAME)/,,$(BUILD_TAG))
 GIT_COMMIT := $(strip $(shell git rev-parse HEAD))
 GIT_COMMIT_SHORT := $(strip $(shell git rev-parse --short HEAD))
 GIT_COMMIT_DATE := $(strip $(shell git show --no-patch --format='%ct' "$(GIT_COMMIT)"))
+IMAGE_MRC_ID := $(strip $(shell git log --max-count=1 --format='%H' ./))
+IMAGE_MRC_TAG := $(strip $(shell git describe --abbrev=0 --match "$(DOCKER_IMAGE_NAME)/*" --tags --exact-match "$(IMAGE_MRC_ID)" 2>&- || echo "<n/a>"))
+IMAGE_UPTODATE := $(if $(filter-out <n/a>,$(IMAGE_MRC_TAG)),yes,no)
 
 # Declare build variables
 DOCKER_REGISTRY := https://quay.io
@@ -69,7 +72,8 @@ $(info ============================== $(DOCKER_IMAGE_NAME) =====================
 $(info >> Build Identifier: $(BUILD_VERSION) @ $(BUILD_DATE))
 $(info >> Git Commit: $(GIT_COMMIT) @ $(GIT_COMMIT_DATE))
 $(info >> Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG))
-$(info >> Flags: cleanRepo=$(GIT_CLEAN_REPO_CHECK) releaseGoal=$(RELEASE_GOAL_CHECK))
+$(info >> Docker Image MRC: $(IMAGE_MRC_ID) (Tag: $(IMAGE_MRC_TAG)))
+$(info >> Flags: cleanRepo=$(GIT_CLEAN_REPO_CHECK) releaseGoal=$(RELEASE_GOAL_CHECK) upToDate=$(IMAGE_UPTODATE))
 $(info )
 
 # Combined targets
@@ -132,4 +136,17 @@ push: login
 output:
 	@echo Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)
 
-.PHONY: default release test build lint login push output auto
+# Update image tag if not already most recent
+update:
+ifneq ($(IMAGE_UPTODATE),yes)
+	@echo "Image $(DOCKER_IMAGE_NAME) is outdated with version $(BUILD_VERSION)"; \
+	echo "Changelog since latest release:"; \
+	git log --oneline "$(BUILD_TAG)..HEAD" ./; \
+	read -p "Please enter new version number: " _version; \
+	git tag "$(DOCKER_IMAGE_NAME)/$${_version}" "$(IMAGE_MRC_ID)"; \
+	echo "Tagged $(IMAGE_MRC_ID) as $(DOCKER_IMAGE_NAME)/$${_version}"
+else
+	@echo "Image $(DOCKER_IMAGE_NAME) is up-to-date with version $(BUILD_VERSION)"
+endif
+
+.PHONY: default release test build lint login push output update auto
