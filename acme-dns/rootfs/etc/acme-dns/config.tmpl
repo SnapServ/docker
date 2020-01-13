@@ -4,7 +4,7 @@ protocol = "both"
 domain = {{ env "ACMEDNS_DOMAIN" "auth.example.com" | quote }}
 nsname = {{ env "ACMEDNS_NSNAME" "auth.example.com" | quote }}
 nsadmin = {{ env "ACMEDNS_NSADMIN" "admin.example.com" | quote }}
-records = [{{ range $record := (env "ACMEDNS_RECORDS" "" | split ",") }}
+records = [{{ range $record := (env "ACMEDNS_RECORDS" "" | split "," | trimSpace) }}
     {{ $record | quote }},
 {{ end }}]
 
@@ -16,7 +16,7 @@ connection = {{ env "ACMEDNS_DB_CONNECTION" "/cts/acme-dns/persistent/acme-dns.d
 listen = "[::]"
 port = "8080"
 tls = "none"
-corsorigins = [{{ range $origin := (env "ACMEDNS_CORS_ORIGINS" "*" | split ",") }}
+corsorigins = [{{ range $origin := (env "ACMEDNS_CORS_ORIGINS" "*" | split "," | trimSpace) }}
     {{ $origin | quote }},
 {{ end }}]
 use_header = {{ env "ACMEDNS_USE_HEADER" "true" | toBool }}
