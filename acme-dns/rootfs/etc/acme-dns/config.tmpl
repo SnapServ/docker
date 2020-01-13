@@ -15,7 +15,8 @@ connection = {{ env "ACMEDNS_DB_CONNECTION" "/cts/acme-dns/persistent/acme-dns.d
 [api]
 listen = "[::]"
 port = "8080"
-tls = "none"
+tls = {{ env "ACMEDNS_TLS" "none" | quote }}
+acme_cache_dir = {{ env "ACMEDNS_ACME_CACHE_DIR" "/cts/acme-dns/persistent/api-certs" | quote }}
 corsorigins = [{{ range $origin := (env "ACMEDNS_CORS_ORIGINS" "*" | split "," | trimSpace) }}
     {{ $origin | quote }},
 {{ end }}]
