@@ -19,13 +19,15 @@ type TemplateCmd struct {
 
 func (c *TemplateCmd) Run() error {
 	tmpl := template.New("").Funcs(template.FuncMap{
-		"contains": c.contains,
-		"default":  c.defaultValue,
-		"env":      c.envValue,
-		"quote":    c.quote,
-		"split":    c.split,
-		"ternary":  c.ternary,
-		"toBool":   c.toBool,
+		"contains":  c.contains,
+		"default":   c.defaultValue,
+		"env":       c.envValue,
+		"quote":     c.quote,
+		"split":     c.split,
+		"ternary":   c.ternary,
+		"toBool":    c.toBool,
+		"trim":      c.trim,
+		"trimSpace": c.trimSpace,
 	}).Option("missingkey=error")
 
 	if len(c.Delimiters) == 2 {
@@ -140,6 +142,38 @@ func (c *TemplateCmd) toBool(value interface{}) bool {
 	}
 
 	return false
+}
+
+func (c *TemplateCmd) trim(cutset string, value interface{}) (interface{}, error) {
+	if strSlice, ok := value.([]string); ok {
+		result := make([]string, 0, len(strSlice))
+		for _, str := range strSlice {
+			result = append(result, strings.Trim(str, cutset))
+		}
+		return result, nil
+	}
+
+	if str, ok := value.(string); ok {
+		return strings.Trim(str, cutset), nil
+	}
+
+	return nil, fmt.Errorf("unsupported argument type %T for value: %+v", value, value)
+}
+
+func (c *TemplateCmd) trimSpace(value interface{}) (interface{}, error) {
+	if strSlice, ok := value.([]string); ok {
+		result := make([]string, 0, len(strSlice))
+		for _, str := range strSlice {
+			result = append(result, strings.TrimSpace(str))
+		}
+		return result, nil
+	}
+
+	if str, ok := value.(string); ok {
+		return strings.TrimSpace(str), nil
+	}
+
+	return nil, fmt.Errorf("unsupported argument type [%T] for value: %+v", value, value)
 }
 
 func (c *TemplateContext) Env() map[string]string {
