@@ -23,17 +23,18 @@ type TemplateCmd struct {
 func (c *TemplateCmd) Run() error {
 	c.ctx = &TemplateContext{}
 	c.tmpl = template.New("").Funcs(template.FuncMap{
-		"contains":  c.contains,
-		"default":   c.defaultValue,
-		"env":       c.envValue,
-		"envSlice":  c.envSlice,
-		"join":      c.join,
-		"quote":     c.quote,
-		"split":     c.split,
-		"ternary":   c.ternary,
-		"toBool":    c.toBool,
-		"trim":      c.trim,
-		"trimSpace": c.trimSpace,
+		"contains":   c.contains,
+		"default":    c.defaultValue,
+		"env":        c.envValue,
+		"envSlice":   c.envSlice,
+		"join":       c.join,
+		"quote":      c.quote,
+		"parseSlice": c.parseSlice,
+		"split":      c.split,
+		"ternary":    c.ternary,
+		"toBool":     c.toBool,
+		"trim":       c.trim,
+		"trimSpace":  c.trimSpace,
 	}).Option("missingkey=error")
 
 	if len(c.Delimiters) == 2 {
@@ -96,7 +97,26 @@ func (c *TemplateCmd) defaultValue(defaultValue, value interface{}) interface{} 
 }
 
 func (c *TemplateCmd) envSlice(separator, key string) []string {
-	data := c.envValue(key, "")
+	return c.parseSlice(separator, c.envValue(key, ""))
+}
+
+func (c *TemplateCmd) envValue(key, defaultValue string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+
+	return defaultValue
+}
+
+func (c *TemplateCmd) join(separator string, values []string) string {
+	return strings.Join(values, separator)
+}
+
+func (c *TemplateCmd) quote(value string) string {
+	return fmt.Sprintf("%q", value)
+}
+
+func (c *TemplateCmd) parseSlice(separator, data string) []string {
 	data = strings.ReplaceAll(data, "\r\n", "\n")
 	data = strings.ReplaceAll(data, "\r", "\n")
 
@@ -116,22 +136,6 @@ func (c *TemplateCmd) envSlice(separator, key string) []string {
 	}
 
 	return results
-}
-
-func (c *TemplateCmd) envValue(key, defaultValue string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-
-	return defaultValue
-}
-
-func (c *TemplateCmd) join(sep string, values []string) string {
-	return strings.Join(values, sep)
-}
-
-func (c *TemplateCmd) quote(value string) string {
-	return fmt.Sprintf("%q", value)
 }
 
 func (c *TemplateCmd) split(separator, value string) []string {
