@@ -10,7 +10,7 @@ COPY --from=acme-dns /root/acme-dns /usr/local/bin/acme-dns
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
-USER acme-dns
+USER 2000
 EXPOSE 5353/tcp 5353/udp 8080/tcp
 VOLUME [ "/cts/acme-dns/persistent" ]
 
