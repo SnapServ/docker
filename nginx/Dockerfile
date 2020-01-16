@@ -2,7 +2,7 @@ FROM quay.io/snapserv/base-alpine:1.1.5@sha256:bdb842e45ba409ff048f6c23fd954c38c
 
 RUN true \
     # Install nginx and remove unused defaults
-    && apk add --no-cache nginx==1.16.1-r4 \
+    && apk add --no-cache nginx \
     && rm /etc/nginx/conf.d/default.conf \
     # Prepare container runtime environment
     && ctutil account -u 2000 -g 2000 www-data \
