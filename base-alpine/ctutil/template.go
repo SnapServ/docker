@@ -96,7 +96,7 @@ func (c *TemplateCmd) defaultValue(defaultValue, value interface{}) interface{} 
 	return defaultValue
 }
 
-func (c *TemplateCmd) envSlice(separator, key string) []string {
+func (c *TemplateCmd) envSlice(key, separator string) []string {
 	return c.parseSlice(separator, c.envValue(key, ""))
 }
 
