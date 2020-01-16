@@ -105,7 +105,7 @@ build:
 		--label org.label-schema.url="$(DOCKER_LABEL_URL)" \
 		--label org.label-schema.vcs-url="$(DOCKER_LABEL_VCS_URL)" \
 		--label org.label-schema.build-date="$(BUILD_DATE)" \
-		--label org.label-schema.version="$(BUILD_VERSION)" \
+		--label org.label-schema.version="$(DOCKER_IMAGE_TAG)" \
 		--label org.label-schema.vcs-ref="$(GIT_COMMIT)" \
 		--label org.label-schema.schema-version="1.0" \
 		--tag $(DOCKER_IMAGE_PATH):latest \
