@@ -1,5 +1,5 @@
 FROM gitea/gitea:1.10.3@sha256:5a86cf46edbe69a8589c3aabb4cae8adee09236977e9a5f83d36fa83c06013eb AS gitea
-FROM quay.io/snapserv/base-alpine:1.1.7@sha256:63173770ee3f0a4cebcb12225198eecae7dcb3103c3e633ab18e5ec7985114f7
+FROM quay.io/snapserv/base-alpine:1.1.9@sha256:5245bf05606d652078946f4fd234154059903b6705eee741c01ef005a4c5c5d6
 
 RUN true \
     # Install runtime dependencies
