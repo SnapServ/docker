@@ -2,8 +2,8 @@
 #shellcheck shell=ash
 set -euo pipefail
 
-MARIADB_ROOT_PASSWORD="$(ctutil secret "MARIADB_ROOT_PASSWORD")"
-MARIADB_USER_PASSWORD="$(ctutil secret "MARIADB_USER_PASSWORD")"
+MARIADB_ROOT_PASSWORD="$(ctutil secret "MARIADB_ROOT_PASSWORD" "")"
+MARIADB_USER_PASSWORD="$(ctutil secret "MARIADB_USER_PASSWORD" "")"
 
 mariadb_prepare_data_dir() {
     ctutil log "preparing data directories..."
