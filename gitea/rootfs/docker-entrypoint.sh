@@ -2,7 +2,7 @@
 #shellcheck shell=ash
 set -euo pipefail
 
-ctutil template /etc/gitea/app.ini.gotmpl=/cts/gitea/persistent/data/app.ini
+ctutil template /etc/gitea/app.ini.tmpl=/cts/gitea/persistent/data/app.ini
 
 exec ctutil run -p gitea -- gitea web \
     --config "/cts/gitea/persistent/data/app.ini" \
