@@ -16,7 +16,7 @@ RUN true \
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
-USER mariadb
+USER 2000
 EXPOSE 3306/tcp
 VOLUME [ "/cts/mariadb/persistent", "/cts/mariadb/volatile" ]
 
