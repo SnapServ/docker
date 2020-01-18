@@ -2,8 +2,8 @@
 #shellcheck shell=ash
 set -euo pipefail
 
-MARIADB_ROOT_PASSWORD="$(ctutil secret "MARIADB_ROOT_PASSWORD" "")"
-MARIADB_USER_PASSWORD="$(ctutil secret "MARIADB_USER_PASSWORD" "")"
+MARIADB_ROOT_PASSWORD="$(ctutil secret "MARIADB_ROOT_PASSWORD" || true)"
+MARIADB_USER_PASSWORD="$(ctutil secret "MARIADB_USER_PASSWORD" || true)"
 
 mariadb_prepare_data_dir() {
     ctutil log "preparing data directories..."
@@ -127,7 +127,7 @@ mariadb_server_stop() {
 ctutil directory -m 0700 \
   /cts/mariadb/persistent/data \
   /cts/mariadb/volatile/run \
-  /cts/mariadb/volatile/tmp \
+  /cts/mariadb/volatile/tmp
 
 if [ $# -ge 1 ]; then
     exec ctutil run -p mariadb -- "${@}"
