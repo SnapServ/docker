@@ -124,6 +124,11 @@ mariadb_server_stop() {
     fi
 }
 
+ctutil directory -m 0700 \
+  /cts/mariadb/persistent/data \
+  /cts/mariadb/volatile/run \
+  /cts/mariadb/volatile/tmp \
+
 if [ $# -ge 1 ]; then
     exec ctutil run -p mariadb -- "${@}"
 fi
