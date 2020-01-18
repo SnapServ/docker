@@ -16,7 +16,7 @@ COPY --from=gitea /app/gitea/gitea /usr/local/bin/gitea
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
-USER gitea
+USER 2000
 EXPOSE 2222/tcp 3000/tcp
 VOLUME [ "/cts/gitea/persistent" ]
 
