@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/alecthomas/kong"
 )
@@ -17,6 +18,7 @@ var cli struct {
 }
 
 func main() {
+	log.SetOutput(os.Stderr)
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 
 	ctx := kong.Parse(&cli)
