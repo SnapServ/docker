@@ -139,9 +139,21 @@ func (c *TemplateCmd) parseSlice(separator, data string) []string {
 	return results
 }
 
-func (c *TemplateCmd) secret(key string) (string, error) {
+func (c *TemplateCmd) secret(key string, args ...string) (string, error) {
 	secretCmd := &SecretCmd{Name: key}
-	return secretCmd.resolve()
+	secret, err := secretCmd.resolve()
+
+	if err != nil {
+		if len(args) == 1 {
+			return args[0], nil
+		} else if len(args) > 1 {
+			return "", fmt.Errorf("unsupported argument count, expected at most 2, got %d", len(args))
+		}
+
+		return "", err
+	}
+
+	return secret, nil
 }
 
 func (c *TemplateCmd) split(separator, value string) []string {
