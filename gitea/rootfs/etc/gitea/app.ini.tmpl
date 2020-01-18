@@ -25,8 +25,8 @@ USER = {{ env "GITEA_DATABASE_USERNAME" "gitea" }}
 PASSWD = {{ env "GITEA_DATABASE_PASSWORD" "gitea" }}
 
 [service]
-DISABLE_REGISTRATION = {{ env "GITEA_REGISTRATION" "true" | toBool }}
-REQUIRE_SIGNIN_VIEW = {{ env "GITEA_ANONYMOUS" "true" | toBool }}
+DISABLE_REGISTRATION = {{ not (env "GITEA_REGISTRATION" "true" | toBool) }}
+REQUIRE_SIGNIN_VIEW = {{ not (env "GITEA_ANONYMOUS" "true" | toBool) }}
 
 [security]
 {{ if contains .Env "GITEA_SECRET_KEY" }}
