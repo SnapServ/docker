@@ -30,6 +30,7 @@ func (c *TemplateCmd) Run() error {
 		"join":       c.join,
 		"quote":      c.quote,
 		"parseSlice": c.parseSlice,
+		"secret":     c.secret,
 		"split":      c.split,
 		"ternary":    c.ternary,
 		"toBool":     c.toBool,
@@ -136,6 +137,11 @@ func (c *TemplateCmd) parseSlice(separator, data string) []string {
 	}
 
 	return results
+}
+
+func (c *TemplateCmd) secret(key string) (string, error) {
+	secretCmd := &SecretCmd{Name: key}
+	return secretCmd.resolve()
 }
 
 func (c *TemplateCmd) split(separator, value string) []string {

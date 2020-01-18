@@ -11,24 +11,30 @@ type SecretCmd struct {
 }
 
 func (c *SecretCmd) Run() error {
-	envName := sanitizeEnvName(c.Name)
-	envDirect := os.Getenv(envName)
-	envFile := os.Getenv(envName + "_FILE")
+	result, err := c.resolve()
+	if err != nil {
+		return err
+	}
 
-	if envFile != "" {
+	fmt.Print(result)
+	return nil
+}
+
+func (c *SecretCmd) resolve() (string, error) {
+	envName := sanitizeEnvName(c.Name)
+
+	if envFile, ok := os.LookupEnv(envName + "_FILE"); ok {
 		contents, err := ioutil.ReadFile(envFile)
 		if err != nil {
-			return fmt.Errorf("could not read secret [%s] from file [%s]: %w", envName, envFile, err)
+			return "", fmt.Errorf("could not read secret [%s] from file [%s]: %w", envName, envFile, err)
 		}
 
-		fmt.Print(string(contents))
-		return nil
+		return string(contents), nil
 	}
 
-	if envDirect != "" {
-		fmt.Printf(envDirect)
-		return nil
+	if envDirect, ok := os.LookupEnv(envName); ok {
+		return envDirect, nil
 	}
 
-	return fmt.Errorf("no secret data available for [%s]", envName)
+	return "", fmt.Errorf("no secret data available for [%s]", envName)
 }
