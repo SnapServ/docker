@@ -57,6 +57,7 @@ SKIP_VERIFY = {{ not (env "GITEA_MAILER_TLS_VERIFY" "true" | toBool) }}
 
 [repository]
 ROOT = /cts/gitea/persistent/data/repositories
+SCRIPT_TYPE = sh
 
 [indexer]
 ISSUE_INDEXER_PATH = /cts/gitea/persistent/data/indexers/issues.bleve

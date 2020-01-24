@@ -4,7 +4,6 @@ FROM quay.io/snapserv/base-alpine:1.1.9@sha256:5245bf05606d652078946f4fd23415405
 RUN true \
     # Install runtime dependencies
     && apk add --no-cache \
-    bash \
     git \
     # Prepare container runtime environment
     && ctutil account -u 2000 -g 2000 -h /cts/gitea/persistent/home gitea \
