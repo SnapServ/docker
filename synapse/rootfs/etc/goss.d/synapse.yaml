@@ -1,0 +1,23 @@
+process:
+  python3:
+    running: true
+
+port:
+  tcp6:8008:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/synapse: &file-synapse-dir
+    exists: true
+    mode: '0700'
+    owner: 'synapse'
+    group: 'synapse'
+    filetype: 'directory'
+
+  /cts/synapse/persistent: *file-synapse-dir
+  /cts/synapse/volatile: *file-synapse-dir
+
+http:
+  http://localhost:8008/:
+    status: 200

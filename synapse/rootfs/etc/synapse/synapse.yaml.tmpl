@@ -1,0 +1,61 @@
+{{- $serverName := env "SYNAPSE_SERVER_NAME" "matrix.example.com" }}
+{{- $databaseName := env "SYNAPSE_DATABASE_NAME" "sqlite3" }}
+{{- $registrationSharedSecret := secret "SYNAPSE_REGISTRATION_SHARED_SECRET" "" }}
+{{- $macaroonSecretKey := secret "SYNAPSE_MACAROON_SECRET_KEY" "" }}
+{{- $formSecret := secret "SYNAPSE_FORM_SECRET" "" }}
+
+pid_file: "/cts/synapse/volatile/synapse.pid"
+log_config: "/cts/synapse/persistent/logger.yaml"
+media_store_path: "/cts/synapse/persistent/media"
+
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ["::"]
+    resources:
+      - names: [client, federation]
+        compress: false
+
+database:
+  name: {{ $databaseName | quote }}
+  args:
+  {{- if eq $databaseName "sqlite3" }}
+    database: "/cts/synapse/persistent/synapse.db"
+  {{- else if eq $databaseName "psycopg2" }}
+    host: {{ env "SYNAPSE_DATABASE_HOST" "localhost" | quote }}
+    database: {{ env "SYNAPSE_DATABASE_NAME" "synapse" | quote }}
+    user: {{ env "SYNAPSE_DATABASE_USERNAME" "synapse" | quote }}
+    password: {{ secret "SYNAPSE_DATABASE_PASSWORD" "synapse" | quote }}
+    cp_min: 5
+    cp_max: 10
+  {{- end }}
+
+server_name: {{ $serverName | quote }}
+public_baseurl: {{ env "SYNAPSE_PUBLIC_URL" "https://matrix.example.com/" | quote }}
+admin_contact: {{ env "SYNAPSE_ADMIN_CONTACT" "mailto:admin@example.com" | quote }}
+enable_metrics: {{ env "SYNAPSE_ENABLE_METRICS" "false" | toBool }}
+report_stats: {{ env "SYNAPSE_REPORT_STATS" "false" | toBool }}
+
+signing_key_path: {{ (printf "/cts/synapse/persistent/%s.signing.key" $serverName) | quote }}
+registration_shared_secret: {{ $registrationSharedSecret | ternary ($registrationSharedSecret | quote) "null" }}
+macaroon_secret_key: {{ $macaroonSecretKey | ternary ($macaroonSecretKey | quote) "null" }}
+form_secret: {{ $formSecret | ternary ($formSecret | quote) "null" }}
+
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+federation_ip_range_blacklist:
+  - "127.0.0.0/8"
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
+  - "100.64.0.0/10"
+  - "169.254.0.0/16"
+  - "::1/128"
+  - "fe80::/64"
+  - "fc00::/7"
+
+push:
+  include_content: false
