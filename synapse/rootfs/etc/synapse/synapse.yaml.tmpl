@@ -1,5 +1,5 @@
 {{- $serverName := env "SYNAPSE_SERVER_NAME" "matrix.example.com" }}
-{{- $databaseName := env "SYNAPSE_DATABASE_NAME" "sqlite3" }}
+{{- $databaseType := env "SYNAPSE_DATABASE_TYPE" "sqlite3" }}
 {{- $registrationSharedSecret := secret "SYNAPSE_REGISTRATION_SHARED_SECRET" "" }}
 {{- $macaroonSecretKey := secret "SYNAPSE_MACAROON_SECRET_KEY" "" }}
 {{- $formSecret := secret "SYNAPSE_FORM_SECRET" "" }}
@@ -19,11 +19,11 @@ listeners:
         compress: false
 
 database:
-  name: {{ $databaseName | quote }}
+  name: {{ $databaseType | quote }}
   args:
-  {{- if eq $databaseName "sqlite3" }}
+  {{- if eq $databaseType "sqlite3" }}
     database: "/cts/synapse/persistent/synapse.db"
-  {{- else if eq $databaseName "psycopg2" }}
+  {{- else if eq $databaseType "psycopg2" }}
     host: {{ env "SYNAPSE_DATABASE_HOST" "localhost" | quote }}
     database: {{ env "SYNAPSE_DATABASE_NAME" "synapse" | quote }}
     user: {{ env "SYNAPSE_DATABASE_USERNAME" "synapse" | quote }}
