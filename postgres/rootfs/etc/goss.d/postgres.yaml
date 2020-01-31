@@ -16,6 +16,7 @@ file:
     filetype: 'directory'
 
   /cts/postgres/persistent: *file-postgres-dir
+  /cts/postgres/persistent/data: *file-postgres-dir
   /cts/postgres/volatile: *file-postgres-dir
 
 command:
