@@ -15,7 +15,7 @@ RUN true \
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
-ENV PGDATA="/cts/postgres/persistent" \
+ENV PGDATA="/cts/postgres/persistent/data" \
     PGHOST="/cts/postgres/volatile"
 
 USER 2000

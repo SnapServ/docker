@@ -78,7 +78,7 @@ postgres_query() {
 
 POSTGRES_PASSWORD="$(ctutil secret "POSTGRES_PASSWORD")"
 
-if [ ! -f "/cts/postgres/persistent/PG_VERSION" ]; then
+if [ ! -f "/cts/postgres/persistent/data/PG_VERSION" ]; then
   ctutil log "no data directory found, initializing database..."
   postgres_initialize
   postgres_server_start
