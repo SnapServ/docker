@@ -12,6 +12,12 @@ postgres_initialize() {
   postgres_config "unix_socket_directories" "'/cts/postgres/volatile'"
   postgres_config "password_encryption" "'scram-sha-256'"
   postgres_config "listen_addresses" "'*'"
+
+  cat >"${PGDATA}/pg_hba.conf" <<EOF
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   all             all                                     trust
+host    all             all             all                     scram-sha-256
+EOF
 }
 
 postgres_config() {
