@@ -1,0 +1,32 @@
+process:
+  postgres:
+    running: true
+
+port:
+  tcp6:5432:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/postgres: &file-postgres-dir
+    exists: true
+    mode: '0700'
+    owner: 'postgres'
+    group: 'postgres'
+    filetype: 'directory'
+
+  /cts/postgres/persistent: *file-postgres-dir
+  /cts/postgres/volatile: *file-postgres-dir
+
+command:
+  healthcheck/ready:
+    exec: 'pg_isready'
+    exit-status: 0
+
+  healthcheck/socket-auth:
+    exec: 'psql -c "SELECT 1"'
+    exit-status: 0
+
+  healthcheck/user-account:
+    exec: 'PGPASSWORD=goss-insecure psql -h localhost -U goss-user -c "SELECT 1"'
+    exit-status: 0
