@@ -108,3 +108,17 @@ func enrichExitErr(err error) error {
 
 	return err
 }
+
+func uniqueStrings(input []string) []string {
+	unique := make([]string, 0)
+	tmp := make(map[string]bool)
+
+	for _, value := range input {
+		if _, ok := tmp[value]; !ok {
+			tmp[value] = true
+			unique = append(unique, value)
+		}
+	}
+
+	return unique
+}
