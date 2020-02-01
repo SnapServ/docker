@@ -122,3 +122,9 @@ command:
     stdout:
       - '/^Hello World$/'
       - '/^Goodbye World$/'
+
+  ctutil-elf-deps:
+    exec: ctutil elf-deps /bin/busybox
+    exit-status: 0
+    stdout:
+      - '/^libc.musl-.+/'
