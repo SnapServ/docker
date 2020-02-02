@@ -1,0 +1,58 @@
+ALLOWED_HOSTS = [{{ range $host := (envSlice "NETBOX_ALLOWED_HOSTS" "") }}
+    {{ $host | quote }},
+{{ end }}]
+SECRET_KEY = {{ secret "NETBOX_SECRET_KEY" "" | quote }}
+
+BASE_PATH = {{ env "NETBOX_BASE_PATH" "" | quote }}
+CACHE_TIMEOUT = {{ env "NETBOX_CACHE_TIMEOUT" "900" | toNumber }}
+CHANGELOG_RETENTION = {{ env "NETBOX_CHANGELOG_RETENTION" "90" | toNumber }}
+ENFORCE_GLOBAL_UNIQUE = {{ env "NETBOX_ENFORCE_GLOBAL_UNIQUE" "false" | toBool | ternary "True" "False" }}
+LOGIN_REQUIRED = {{ env "NETBOX_LOGIN_REQUIRED" "false" | toBool | ternary "True" "False" }}
+MAINTENANCE_MODE = {{ env "NETBOX_MAINTENANCE_MODE" "false" | toBool | ternary "True" "False" }}
+MAX_PAGE_SIZE = {{ env "NETBOX_MAX_PAGE_SIZE" "1000" | toNumber }}
+MEDIA_ROOT = '/cts/netbox/persistent/media'
+PAGINATE_COUNT = {{ env "NETBOX_PAGINATE_COUNT" "50" | toNumber }}
+PREFER_IPV4 = {{ env "NETBOX_PREFER_IPV4" "false" | toBool | ternary "True" "False" }}
+TIME_ZONE = {{ env "NETBOX_TIMEZONE" "UTC" | quote }}
+
+DATE_FORMAT = {{ env "NETBOX_DATE_FORMAT" "N j, Y" | quote }}
+SHORT_DATE_FORMAT = {{ env "NETBOX_SHORT_DATE_FORMAT" "Y-m-d" | quote }}
+TIME_FORMAT = {{ env "NETBOX_TIME_FORMAT" "g:i a" | quote }}
+SHORT_TIME_FORMAT = {{ env "NETBOX_SHORT_TIME_FORMAT" "H:i:s" | quote }}
+DATETIME_FORMAT = {{ env "NETBOX_DATETIME_FORMAT" "N j, Y g:i a" | quote }}
+SHORT_DATETIME_FORMAT = {{ env "NETBOX_SHORT_DATETIME_FORMAT" "Y-m-d H:i" | quote }}
+
+DATABASE = {
+  'HOST': {{ env "NETBOX_DATABASE_HOST" "localhost" | quote }},
+  'PORT': {{ env "NETBOX_DATABASE_PORT" "5432" | toNumber }},
+  'NAME': {{ env "NETBOX_DATABASE_NAME" "netbox" | quote }},
+  'USER': {{ env "NETBOX_DATABASE_USER" "netbox" | quote }},
+  'PASSWORD': {{ secret "NETBOX_DATABASE_PASSWORD" "netbox" | quote }},
+  'CONN_MAX_AGE': {{ env "NETBOX_DATABASE_CONN_MAX_AGE" "300" | toNumber }},
+}
+
+REDIS = {
+  'webhooks': {
+    'HOST': {{ env "NETBOX_REDIS_WEBHOOKS_HOST" "localhost" | quote }},
+    'PORT': {{ env "NETBOX_REDIS_WEBHOOKS_PORT" "6379" | toNumber }},
+    'PASSWORD': {{ secret "NETBOX_REDIS_WEBHOOKS_PASSWORD" "" | quote }},
+    'DATABASE': {{ env "NETBOX_REDIS_WEBHOOKS_DATABASE" "0" | toNumber }},
+    'SSL': {{ env "NETBOX_REDIS_WEBHOOKS_SSL" "false" | toBool | ternary "True" "False" }},
+  },
+  'caching': {
+    'HOST': {{ env "NETBOX_REDIS_CACHING_HOST" "localhost" | quote }},
+    'PORT': {{ env "NETBOX_REDIS_CACHING_PORT" "6379" | toNumber }},
+    'PASSWORD': {{ secret "NETBOX_REDIS_CACHING_PASSWORD" "" | quote }},
+    'DATABASE': {{ env "NETBOX_REDIS_CACHING_DATABASE" "1" | toNumber }},
+    'SSL': {{ env "NETBOX_REDIS_CACHING_SSL" "false" | toBool | ternary "True" "False" }},
+  },
+}
+
+EMAIL = {
+  'SERVER': {{ env "NETBOX_EMAIL_SERVER" "localhost" | quote }},
+  'PORT': {{ env "NETBOX_EMAIL_PORT" "25" | toNumber }},
+  'USERNAME': {{ env "NETBOX_EMAIL_USERNAME" "" | quote }},
+  'PASSWORD': {{ secret "NETBOX_EMAIL_PASSWORD" "" | quote }},
+  'TIMEOUT': {{ env "NETBOX_EMAIL_TIMEOUT" "10" | toNumber }},
+  'FROM_EMAIL': {{ env "NETBOX_EMAIL_FROM" "" | quote }},
+}
