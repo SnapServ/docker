@@ -8,35 +8,35 @@ WORKDIR /opt/netbox
 COPY rootfs/docker-requirements.txt /
 
 RUN true \
-  # Install runtime dependencies
-  && apk add --no-cache \
-    py3-virtualenv \
-    python3 \
-  # Install build dependencies
-  && apk add --no-cache --virtual .build-deps \
-    gcc \
-    git \
-    libjpeg-turbo-dev \
-    musl-dev \
-    postgresql-dev \
-    python3-dev \
-    zlib-dev \
-  # Install Netbox and dependencies
-  && git clone -b "v${NETBOX_VERSION}" https://github.com/netbox-community/netbox.git . \
-  && virtualenv -p /usr/bin/python3 venv \
-  && set +x && . venv/bin/activate && set -x \
-  && pip3 install --requirement /docker-requirements.txt \
-  && pip3 install --requirement requirements.txt \
-  # Prepare container runtime environment
-  && ctutil account -u 2000 -g 2000 netbox \
-  && ctutil directory -u netbox -g netbox -m 0700 \
-    /cts/netbox/persistent \
-    /cts/netbox/persistent/media \
-  && ln -sf /cts/netbox/persistent/configuration.py /opt/netbox/netbox/netbox/configuration.py \
-  # Uninstall build dependencies
-  && apk add --no-cache $(ctutil elf-deps /opt/netbox | awk '{print "so:"$1}') \
-  && apk del --purge --no-cache .build-deps \
-  && true
+    # Install runtime dependencies
+    && apk add --no-cache \
+        py3-virtualenv \
+        python3 \
+    # Install build dependencies
+    && apk add --no-cache --virtual .build-deps \
+        gcc \
+        git \
+        libjpeg-turbo-dev \
+        musl-dev \
+        postgresql-dev \
+        python3-dev \
+        zlib-dev \
+    # Install Netbox and dependencies
+    && git clone -b "v${NETBOX_VERSION}" https://github.com/netbox-community/netbox.git . \
+    && virtualenv -p /usr/bin/python3 venv \
+    && set +x && . venv/bin/activate && set -x \
+    && pip3 install --requirement /docker-requirements.txt \
+    && pip3 install --requirement requirements.txt \
+    # Prepare container runtime environment
+    && ctutil account -u 2000 -g 2000 netbox \
+    && ctutil directory -u netbox -g netbox -m 0700 \
+        /cts/netbox/persistent \
+        /cts/netbox/persistent/media \
+    && ln -sf /cts/netbox/persistent/configuration.py /opt/netbox/netbox/netbox/configuration.py \
+    # Uninstall build dependencies
+    && apk add --no-cache $(ctutil elf-deps /opt/netbox | awk '{print "so:"$1}') \
+    && apk del --purge --no-cache .build-deps \
+    && true
 
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
