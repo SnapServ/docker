@@ -34,6 +34,7 @@ func (c *TemplateCmd) Run() error {
 		"split":      c.split,
 		"ternary":    c.ternary,
 		"toBool":     c.toBool,
+		"toNumber":   c.toNumber,
 		"trim":       c.trim,
 		"trimSpace":  c.trimSpace,
 	}).Option("missingkey=error")
@@ -173,30 +174,45 @@ func (c *TemplateCmd) ternary(trueValue, falseValue, condition interface{}) inte
 	return falseValue
 }
 
-func (c *TemplateCmd) toBool(value interface{}) bool {
-	if b, ok := value.(bool); ok {
-		return b
+func (c *TemplateCmd) toBool(value interface{}) (bool, error) {
+	refValue := reflect.Indirect(reflect.ValueOf(value))
+	switch refValue.Kind() {
+	case reflect.Bool:
+		return refValue.Bool(), nil
+	case reflect.String:
+		return strconv.ParseBool(refValue.String())
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
+		return refValue.Int() == 1, nil
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
+		return refValue.Uint() == 1, nil
+	case reflect.Float32, reflect.Float64:
+		return refValue.Float() == 1, nil
 	}
 
-	if s, ok := value.(string); ok {
-		if b, err := strconv.ParseBool(s); err == nil {
-			return b
-		} else {
-			return false
-		}
-	}
+	return false, fmt.Errorf("could not parse [%s] as boolean", refValue.String())
+}
 
+func (c *TemplateCmd) toNumber(value interface{}) (interface{}, error) {
 	refValue := reflect.Indirect(reflect.ValueOf(value))
 	switch refValue.Kind() {
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
-		return refValue.Int() == 1
+		return refValue.Int(), nil
 	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uint:
-		return refValue.Uint() == 1
+		return refValue.Uint(), nil
 	case reflect.Float32, reflect.Float64:
-		return refValue.Float() == 1
+		return refValue.Float(), nil
+	case reflect.String:
+		s := refValue.String()
+		if u, err := strconv.ParseUint(s, 10, 64); err == nil {
+			return u, nil
+		} else if i, err := strconv.ParseInt(s, 10, 64); err == nil {
+			return i, nil
+		} else if f, err := strconv.ParseFloat(s, 64); err == nil {
+			return f, nil
+		}
 	}
 
-	return false
+	return 0, fmt.Errorf("could not parse [%s] as number", refValue.String())
 }
 
 func (c *TemplateCmd) trim(cutset string, value interface{}) (interface{}, error) {
