@@ -1,10 +1,10 @@
 file:
-  /cts/netbox: &file-synapse-dir
+  /cts/netbox: &netbox
     exists: true
     mode: '0700'
-    owner: 'synapse'
-    group: 'synapse'
+    owner: 'netbox'
+    group: 'netbox'
     filetype: 'directory'
 
-  /cts/netbox/persistent: *file-synapse-dir
-  /cts/netbox/persistent/media: *file-synapse-dir
+  /cts/netbox/persistent: *netbox
+  /cts/netbox/persistent/media: *netbox
