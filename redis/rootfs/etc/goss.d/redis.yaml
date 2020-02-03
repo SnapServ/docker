@@ -1,0 +1,29 @@
+process:
+  redis-server:
+    running: true
+
+port:
+  tcp:6379:
+    listening: true
+    ip: ['0.0.0.0']
+
+  tcp6:6379:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/redis: &file-redis-dir
+    exists: true
+    mode: '0700'
+    owner: 'redis'
+    group: 'redis'
+    filetype: 'directory'
+
+  /cts/redis/persistent: *file-redis-dir
+
+command:
+  healthcheck:
+    exec: 'redis-cli ping'
+    exit-status: 0
+    stdout:
+      - '/^PONG$/'
