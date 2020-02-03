@@ -2,7 +2,8 @@ FROM quay.io/snapserv/base-alpine:1.1.11@sha256:687154bc9982b227224c33a95b2d8bd2
 
 RUN true \
     # Install nginx and remove unused defaults
-    && apk add --no-cache nginx \
+    && apk add --no-cache \
+        nginx \
     && rm /etc/nginx/conf.d/default.conf \
     # Prepare container runtime environment
     && ctutil account -u 2000 -g 2000 www-data \
@@ -19,9 +20,8 @@ RUN true \
 
 COPY rootfs /
 
-USER www-data
+USER 2000
 EXPOSE 8080/tcp
 VOLUME [ "/cts/nginx/volatile" ]
 
-ENTRYPOINT [ "/usr/sbin/nginx" ]
-CMD [ "-g", "daemon off;" ]
+ENTRYPOINT [ "/usr/sbin/nginx", "-g", "daemon off;" ]
