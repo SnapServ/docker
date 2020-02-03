@@ -8,7 +8,9 @@ log = $(if $(filter s,$(MAKEFLAGS)),,$(call info,$(1)))
 
 # Escape codes for colored output
 cc_red=$(shell echo -e "\033[0;31m")
+cc_yellow=$(shell echo -e "\033[0;33m")
 cc_green=$(shell echo -e "\033[0;32m")
+cc_blue=$(shell echo -e "\033[0;34m")
 cc_end=$(shell echo -e "\033[0m")
 
 # Detect latest Git tag for image
@@ -76,13 +78,19 @@ endif
 DOCKER_IMAGE_TAG := $(subst $(DOCKER_IMAGE_NAME)/,,$(BUILD_VERSION))
 endif
 
+# Calculate build tag date in days if available
+BUILD_TAG_AGE := <n/a>
+ifneq ($(BUILD_TAG_DATE),<n/a>)
+BUILD_TAG_AGE := $$(( ($$(date +'%s') - $$(date --date="$(BUILD_TAG_DATE)" +'%s')) / (60 * 60 * 24) ))
+endif
+
 # Print information about current build task
-$(call log,============================== $(DOCKER_IMAGE_NAME) ==============================)
-$(call log,>> Build Identifier: $(BUILD_VERSION) @ $(BUILD_DATE))
-$(call log,>> Git Commit: $(GIT_COMMIT) @ $(GIT_COMMIT_DATE))
-$(call log,>> Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG))
-$(call log,>> Docker Image MRC: $(IMAGE_MRC_ID) (Tag: $(IMAGE_MRC_TAG)))
-$(call log,>> Flags: cleanRepo=$(GIT_CLEAN_REPO_CHECK) releaseGoal=$(RELEASE_GOAL_CHECK) upToDate=$(IMAGE_UPTODATE))
+$(call log, "============================== $(DOCKER_IMAGE_NAME) ==============================")
+$(call log, ">> Build Identifier: $(BUILD_VERSION) @ $(BUILD_DATE)")
+$(call log, ">> Git Commit: $(GIT_COMMIT) @ $(GIT_COMMIT_DATE)")
+$(call log, ">> Docker Image: $(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)")
+$(call log, ">> Docker Image MRC: $(IMAGE_MRC_ID) (Tag: $(IMAGE_MRC_TAG))")
+$(call log, ">> Flags: cleanRepo=$(GIT_CLEAN_REPO_CHECK) releaseGoal=$(RELEASE_GOAL_CHECK) upToDate=$(IMAGE_UPTODATE)")
 $(call log,)
 
 # Combined targets
@@ -148,9 +156,20 @@ output:
 # Check if image is up-to-date
 check-update:
 ifneq ($(IMAGE_UPTODATE),yes)
-	@echo "$(cc_red)[NOK]$(cc_end) Image $(DOCKER_IMAGE_NAME) is outdated since $(BUILD_TAG_DATE) with version $(BUILD_VERSION)"
+# Display age in days and date, fallback to only date, then fallback to never released
+ifneq ($(BUILD_TAG_AGE),<n/a>)
+ifeq ($(shell test $(BUILD_TAG_AGE) -gt 14; echo "$$?"),0)
+	@echo "$(cc_red)[CRIT]$(cc_end) Image $(DOCKER_IMAGE_NAME) is outdated since $(BUILD_TAG_AGE) days ($(BUILD_TAG_DATE)) with version $(BUILD_VERSION)"
 else
-	@echo "$(cc_green)[OK]$(cc_end)  Image $(DOCKER_IMAGE_NAME) is up-to-date with version $(BUILD_VERSION)"
+	@echo "$(cc_yellow)[WARN]$(cc_end) Image $(DOCKER_IMAGE_NAME) is outdated since $(BUILD_TAG_AGE) days ($(BUILD_TAG_DATE)) with version $(BUILD_VERSION)"
+endif
+else ifneq ($(BUILD_TAG_DATE),<n/a>)
+	@echo "$(cc_red)[CRIT]$(cc_end) Image $(DOCKER_IMAGE_NAME) is outdated since $(BUILD_TAG_DATE) with version $(BUILD_VERSION)"
+else
+	@echo "$(cc_blue)[INIT]$(cc_end) Image $(DOCKER_IMAGE_NAME) has not been released so far"
+endif
+else
+	@echo "$(cc_green)[GOOD]$(cc_end) Image $(DOCKER_IMAGE_NAME) is up-to-date with version $(BUILD_VERSION)"
 endif
 
 # Update image tag if not already most recent
