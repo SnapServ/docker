@@ -38,10 +38,15 @@ DOCKER_BUILD_FLAGS ?=
 GOSS_FILES_PATH := ../
 GOSS_FILES_STRATEGY := mount
 GOSS_OPTS := --color --retry-timeout 60s --sleep 1s
+DGOSS_DOCKER_ARGS ?=
+DGOSS_IMAGE_ARGS ?=
 
 # Use environment variables from goss.env during testing if present
-GOSS_ENV_FILE := goss.env
-ifeq (,$(wildcard $(GOSS_ENV_FILE)))
+GOSS_ENV_FILE := $(abspath $(wildcard goss.env))
+ifneq ($(GOSS_ENV_FILE),)
+DGOSS_DOCKER_ARGS := $(shell grep 'DGOSS_DOCKER_ARGS=' "$(GOSS_ENV_FILE)" | cut -d'=' -f2-)
+DGOSS_IMAGE_ARGS := $(shell grep 'DGOSS_IMAGE_ARGS=' "$(GOSS_ENV_FILE)" | cut -d'=' -f2-)
+else
 GOSS_ENV_FILE := /dev/null
 endif
 
@@ -137,7 +142,9 @@ goss: build
 	dgoss run -it --rm \
 		--env-file "$(GOSS_ENV_FILE)" \
 		--read-only --tmpfs /run --tmpfs /tmp \
-		"$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)"
+		$(DGOSS_DOCKER_ARGS) \
+		"$(DOCKER_IMAGE_PATH):$(DOCKER_IMAGE_TAG)" \
+		$(DGOSS_IMAGE_ARGS)
 
 # Login to registry
 login:
