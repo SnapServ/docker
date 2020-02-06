@@ -10,6 +10,7 @@ ENFORCE_GLOBAL_UNIQUE = {{ env "NETBOX_ENFORCE_GLOBAL_UNIQUE" "false" | toBool |
 LOGIN_REQUIRED = {{ env "NETBOX_LOGIN_REQUIRED" "false" | toBool | ternary "True" "False" }}
 MAINTENANCE_MODE = {{ env "NETBOX_MAINTENANCE_MODE" "false" | toBool | ternary "True" "False" }}
 MAX_PAGE_SIZE = {{ env "NETBOX_MAX_PAGE_SIZE" "1000" | toNumber }}
+METRICS_ENABLED = {{ env "NETBOX_METRICS_ENABLED" "true" | toBool | ternary "True" "False" }}
 MEDIA_ROOT = '/cts/netbox/persistent/media'
 PAGINATE_COUNT = {{ env "NETBOX_PAGINATE_COUNT" "50" | toNumber }}
 PREFER_IPV4 = {{ env "NETBOX_PREFER_IPV4" "false" | toBool | ternary "True" "False" }}
