@@ -32,6 +32,8 @@ RUN true \
     && ctutil directory -u netbox -g netbox -m 0700 \
         /cts/netbox/persistent \
         /cts/netbox/persistent/media \
+        /cts/netbox/persistent/reports \
+        /cts/netbox/persistent/scripts \
     && ln -sf /cts/netbox/persistent/configuration.py /opt/netbox/netbox/netbox/configuration.py \
     # Uninstall build dependencies
     && apk add --no-cache $(ctutil elf-deps /opt/netbox | awk '{print "so:"$1}') \

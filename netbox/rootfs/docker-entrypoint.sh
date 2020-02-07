@@ -3,7 +3,9 @@
 set -euo pipefail
 
 ctutil directory -m 0700 \
-  /cts/netbox/persistent/media
+  /cts/netbox/persistent/media \
+  /cts/netbox/persistent/reports \
+  /cts/netbox/persistent/scripts
 ctutil template /etc/netbox/configuration.py.tmpl=/cts/netbox/persistent/configuration.py
 
 if [ $# -ge 1 ]; then
