@@ -2,14 +2,15 @@ FROM quay.io/pusher/oauth2_proxy:v4.1.0-amd64@sha256:dbe773744a8a617a4f2bd9376c7
 FROM quay.io/snapserv/base-alpine:1.1.11@sha256:687154bc9982b227224c33a95b2d8bd20204791ca929bcb939eabf4c5ee46a4c
 
 RUN true \
+    # Prepare container runtime environment
     && ctutil account -u 2000 -g 2000 oauth2-proxy \
     && true
 
 COPY --from=oauth2-proxy /bin/oauth2_proxy /usr/local/bin/oauth2-proxy
 COPY rootfs /
+RUN chmod 0755 /docker-entrypoint.sh
 
-USER oauth2-proxy
+USER 2000
 EXPOSE 4180/tcp
 
-ENTRYPOINT [ "/usr/local/bin/oauth2-proxy" ]
-CMD [ "-http-address=[::]:4180", "-ping-path=/ping", "-silence-ping-logging" ]
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
