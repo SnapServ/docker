@@ -42,7 +42,7 @@ COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
 USER 2000
-EXPOSE 8080/tcp
+EXPOSE 8000/tcp
 VOLUME [ "/cts/netbox/persistent" ]
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]

@@ -12,7 +12,7 @@ if [ $# -ge 1 ]; then
 fi
 
 exec ctutil run -p netbox -- /opt/netbox/venv/bin/gunicorn \
-  --bind '[::]:8080' \
+  --bind '[::]:8000' \
   --pythonpath '/opt/netbox/netbox' \
   --worker-class 'gthread' \
   --workers 2 \
