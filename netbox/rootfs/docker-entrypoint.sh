@@ -17,6 +17,7 @@ exec ctutil run -p netbox -- /opt/netbox/venv/bin/gunicorn \
   --worker-class 'gthread' \
   --workers 2 \
   --threads 4 \
+  --preload \
   --forwarded-allow-ips '*' \
   --access-logfile - \
   --error-logfile - \
