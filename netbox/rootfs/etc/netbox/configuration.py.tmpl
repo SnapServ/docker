@@ -1,4 +1,4 @@
-ALLOWED_HOSTS = [{{ range $host := (envSlice "NETBOX_ALLOWED_HOSTS" "") }}
+ALLOWED_HOSTS = [{{ range $host := (envSlice "NETBOX_ALLOWED_HOSTS" ",") }}
     {{ $host | quote }},
 {{ end }}]
 SECRET_KEY = {{ secret "NETBOX_SECRET_KEY" "" | quote }}
