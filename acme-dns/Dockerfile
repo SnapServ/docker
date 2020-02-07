@@ -2,6 +2,7 @@ FROM joohoi/acme-dns:v0.8@sha256:70e7035969c7c9f2208b6ecc3097d9f199e9d7e8d2e112e
 FROM quay.io/snapserv/base-alpine:1.1.11@sha256:687154bc9982b227224c33a95b2d8bd20204791ca929bcb939eabf4c5ee46a4c
 
 RUN true \
+    # Prepare container runtime environment
     && ctutil account -u 2000 -g 2000 acme-dns \
     && ctutil directory -u acme-dns -g acme-dns -m 0700 /cts/acme-dns/persistent \
     && true
