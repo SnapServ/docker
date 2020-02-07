@@ -7,15 +7,14 @@ RUN true \
     && ctutil account -u 2000 -g 2000 hugo \
     && ctutil directory -u hugo -g hugo -m 0700 \
         /cts/hugo/persistent/data \
-        /cts/hugo/volatile/tmp \
     && true
 
 COPY rootfs /
 RUN chmod 0755 /docker-entrypoint.sh
 
-USER hugo
+USER 2000
 EXPOSE 1313/tcp
-VOLUME [ "/cts/hugo/persistent", "/cts/hugo/volatile" ]
+VOLUME [ "/cts/hugo/persistent" ]
 
 WORKDIR /cts/hugo/persistent/data
 ENTRYPOINT [ "/docker-entrypoint.sh" ]

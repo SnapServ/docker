@@ -21,8 +21,6 @@ file:
 
   /cts/hugo/persistent: *file-hugo-dir
   /cts/hugo/persistent/data: *file-hugo-dir
-  /cts/hugo/volatile: *file-hugo-dir
-  /cts/hugo/volatile/tmp: *file-hugo-dir
 
 http:
   http://localhost:1313/:

@@ -11,7 +11,7 @@ else
     fi
 
     exec ctutil run -p hugo -- hugo server \
-        --bind=:: \
-        --cacheDir=/cts/hugo/volatile/tmp \
-        --config=/etc/hugo-docker.toml,config.toml
+        --bind="::" \
+        --cacheDir="/tmp" \
+        --config="/etc/hugo-docker.toml,config.toml"
 fi
