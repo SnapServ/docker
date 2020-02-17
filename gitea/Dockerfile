@@ -1,4 +1,4 @@
-FROM gitea/gitea:1.11.0@sha256:27fbc647fdd1212bb22e64b996e9deb7d1651bcd254267be0f82a0c2277d5c98 AS gitea
+FROM gitea/gitea:1.11.1@sha256:b038973ab4ee1a04ac5518124c7b5be32aa46cb0fa025adb2b11af38b1acc6a3 AS gitea
 FROM quay.io/snapserv/base-alpine:1.1.11@sha256:687154bc9982b227224c33a95b2d8bd20204791ca929bcb939eabf4c5ee46a4c
 
 RUN true \
