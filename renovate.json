@@ -1,10 +1,12 @@
 {
   "extends": [
     "config:base",
-    "default:automergeMinor",
-    "default:automergeDigest",
     "default:automergeBranch",
+    "default:automergeDigest",
+    "default:automergeMinor",
     "docker:enableMajor",
     "docker:pinDigests"
-  ]
+  ],
+  "semanticCommitScope": "{{parentDir}}",
+  "semanticCommitType": "build"
 }
