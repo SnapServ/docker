@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine@sha256:e8c6ee8a59dab1e57c603073a616c99ead42b2690d504aa88302136e4d9744be AS builder
+FROM golang:1.14-alpine@sha256:3e935ab77ba5d71c7778054fbb60c029c1564b75266beeeb4223aa04265e16c1 AS builder
 
 RUN true \
     && apk add --no-cache \
