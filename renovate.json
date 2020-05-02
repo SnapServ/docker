@@ -7,5 +7,6 @@
     "docker:enableMajor",
     "docker:pinDigests"
   ],
-  "semanticCommitScope": "{{parentDir}}"
+  "semanticCommitScope": "{{parentDir}}",
+  "branchPrefix": "renovate/{{parentDir}}-"
 }
