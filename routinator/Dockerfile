@@ -1,4 +1,4 @@
-FROM rust:1.43@sha256:afeb25419be9f7b69481bd5ad37f107a87fca1bb205a5b694a9f0c9136b5788f AS builder
+FROM rust:1.43@sha256:18aaf0e3fd15310a51601858d79dc490dd123360d60a66c7a88adcd7a8bf9165 AS builder
 
 # renovate: datasource=crate depName=routinator
 ENV ROUTINATOR_VERSION="0.6.4"
