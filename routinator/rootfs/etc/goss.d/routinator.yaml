@@ -1,0 +1,27 @@
+process:
+  routinator:
+    running: true
+
+port:
+  tcp6:3323:
+    listening: true
+    ip: ['::']
+
+  tcp6:9556:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/routinator: &file-routinator-dir
+    exists: true
+    mode: '0700'
+    owner: 'routinator'
+    group: 'routinator'
+    filetype: 'directory'
+
+  /cts/routinator/persistent: *file-routinator-dir
+
+http:
+  http://localhost:9556/status:
+    status: 200
+    allow-insecure: true
