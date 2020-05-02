@@ -12,22 +12,6 @@ command:
     stderr:
       - '/( |$)Hello, the answer is 42$/'
 
-  ctutil-run/init:
-    exec: |
-      set -euo pipefail
-      exec ctutil run -i ps aux
-    exit-status: 0
-    stdout:
-      - 'ctutil: init process'
-
-  ctutil-run/exec:
-    exec: |
-      set -euo pipefail
-      ctutil run ps aux
-    exit-status: 0
-    stdout:
-      - '!ctutil: init process'
-
   ctutil-run/default:
     exec: |
       set -euo pipefail
