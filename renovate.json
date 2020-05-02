@@ -1,6 +1,7 @@
 {
   "extends": [
     "config:base",
+    "default:disableRateLimiting",
     "default:automergeBranch",
     "default:automergeDigest",
     "default:automergeMinor",
