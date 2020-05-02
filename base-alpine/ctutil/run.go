@@ -15,6 +15,7 @@ type RunCmd struct {
 	CmdArgs    []string `kong:"optional,arg,help='Additional arguments for executable'"`
 	Privileges string   `kong:"optional,short=p,help='Drop privileges to given spec',placeholder='<USER|USER:GROUP|UID:GID>'"`
 	Groups     []int    `kong:"optional,short=g,help='Override supplemental groups when using -u',placeholder='SGID'"`
+	ForceInit  bool     `kong:"optional,short=i,help='Force running process with init handler even when PID != 1'"`
 }
 
 func (c *RunCmd) Run() error {
@@ -28,8 +29,25 @@ func (c *RunCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("could not lookup executable path for [%s]: %w", c.Cmd, err)
 	}
-
 	cmdArgv := append([]string{cmdPath}, c.CmdArgs...)
+
+	if os.Getpid() == 1 || c.ForceInit {
+		return c.runInit(cmdPath, cmdArgv)
+	} else {
+		return c.runExec(cmdPath, cmdArgv)
+	}
+}
+
+func (c *RunCmd) runInit(cmdPath string, cmdArgv []string) error {
+	initCmd := &InitCmd{
+		Cmd:     cmdPath,
+		CmdArgs: cmdArgv[1:],
+	}
+
+	return initCmd.Run()
+}
+
+func (c *RunCmd) runExec(cmdPath string, cmdArgv []string) error {
 	if err := syscall.Exec(cmdPath, cmdArgv, os.Environ()); err != nil {
 		return fmt.Errorf("could not exec into process [%s] with args %v: %w", c.Cmd, c.CmdArgs, err)
 	}
