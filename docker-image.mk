@@ -129,7 +129,7 @@ build:
 lint:
 	cat Dockerfile | docker run \
 		-i --rm hadolint/hadolint hadolint - \
-		--ignore SC1091 --ignore SC2046 --ignore DL3018 --ignore DL4006
+		--ignore SC1091 --ignore SC2046 --ignore DL3008 --ignore DL3018 --ignore DL4006
 
 # Test container image with Goss
 goss: build
