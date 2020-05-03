@@ -45,9 +45,9 @@ storage = {{ env "PROSODY_STORAGE" "internal" | quote }}
 
 sql = {
     driver = {{ env "PROSODY_SQL_DRIVER" "MySQL" | quote }};
-    database = {{ env "PROSODY_SQL_NAME" "prosody" | quote }};
     host = {{ env "PROSODY_SQL_HOST" "localhost" | quote }};
     port = {{ env "PROSODY_SQL_PORT" "3306" | toNumber }};
+    database = {{ env "PROSODY_SQL_DATABASE" "prosody" | quote }};
     username = {{ env "PROSODY_SQL_USERNAME" "prosody" | quote }};
     password = {{ secret "PROSODY_SQL_PASSWORD" "prosody" | quote }};
 }
