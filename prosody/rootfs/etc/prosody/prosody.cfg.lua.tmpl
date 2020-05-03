@@ -1,0 +1,45 @@
+use_libevent = false
+daemonize = false
+
+pidfile = "/cts/prosody/volatile/run/prosody.pid"
+certificates = "/cts/prosody/secrets";
+data_path = "/cts/prosody/persistent/data";
+plugin_paths = {
+    "/usr/local/lib/prosody-modules";
+}
+
+modules_enabled = {
+    -- Default Modules
+    "admin_adhoc";
+    "blocklist";
+    "carbons";
+    "dialback";
+    "disco";
+    "pep";
+    "posix";
+    "private";
+    "roster";
+    "saslauth";
+    "time";
+    "tls";
+    "uptime";
+    "vcard";
+    "version";
+
+    -- Additional Modules
+{{ range $module := (envSlice "PROSODY_MODULES" ",") }}
+    {{ $module | quote }};
+{{ end }}
+}
+modules_disabled = {}
+
+c2s_ports = { 5222 }
+s2s_ports = { 5269 }
+http_ports = { 5280 }
+https_ports = {}
+proxy65_ports = { 5000 }
+
+VirtualHost "localhost"
+    modules_disabled = { "tls"; }
+
+Include "/cts/prosody/configs/*.cfg.lua"

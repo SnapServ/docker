@@ -1,0 +1,30 @@
+process:
+  lua5.2:
+    running: true
+
+port:
+  tcp6:5222:
+    listening: true
+    ip: ['::']
+
+  tcp6:5269:
+    listening: true
+    ip: ['::']
+
+file:
+  /cts/prosody: &file-prosody-dir
+    exists: true
+    mode: '0700'
+    owner: 'prosody'
+    group: 'prosody'
+    filetype: 'directory'
+
+  /cts/prosody/configs: *file-prosody-dir
+  /cts/prosody/secrets: *file-prosody-dir
+  /cts/prosody/persistent: *file-prosody-dir
+  /cts/prosody/volatile: *file-prosody-dir
+
+command:
+  status:
+    exec: 'prosodyctl status'
+    exit-status: 0
