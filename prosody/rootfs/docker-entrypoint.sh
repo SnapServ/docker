@@ -3,9 +3,6 @@
 set -euo pipefail
 
 ctutil directory -m 0700 \
-  /cts/prosody/certs \
-  /cts/prosody/configs \
-  /cts/prosody/persistent \
   /cts/prosody/volatile/run
 ctutil template /etc/prosody/prosody.cfg.lua.tmpl=/cts/prosody/persistent/prosody.cfg.lua
 

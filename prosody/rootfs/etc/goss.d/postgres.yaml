@@ -19,8 +19,8 @@ file:
     group: 'prosody'
     filetype: 'directory'
 
+  /cts/prosody/certs: *file-prosody-dir
   /cts/prosody/configs: *file-prosody-dir
-  /cts/prosody/secrets: *file-prosody-dir
   /cts/prosody/persistent: *file-prosody-dir
   /cts/prosody/volatile: *file-prosody-dir
 
