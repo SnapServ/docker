@@ -16,8 +16,8 @@ RUN true \
     # Prepare container runtime environment
     && ctutil account -u 2000 -g 2000 prosody \
     && ctutil directory -u prosody -g prosody -m 0700 \
+        /cts/prosody/certs \
         /cts/prosody/configs \
-        /cts/prosody/secrets \
         /cts/prosody/persistent \
         /cts/prosody/volatile/run \
     && ln -sf /cts/prosody/persistent/prosody.cfg.lua /etc/prosody/prosody.cfg.lua \
