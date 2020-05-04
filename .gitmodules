@@ -1,0 +1,3 @@
+[submodule "snapserv-website"]
+	path = web-snapserv/repository
+	url = ../../snapserv/website.git
