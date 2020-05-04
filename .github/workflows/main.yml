@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  docker-images:
+    name: Lint, build, test and push docker images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Install dgoss for automated testing
+        run: curl -fsSL https://goss.rocks/install | sudo GOSS_VER=v0.3.8 sh
+
+      - name: Run Makefile
+        env:
+          RELEASE_CHECK: 'yes'
+          DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+        run: make @auto
