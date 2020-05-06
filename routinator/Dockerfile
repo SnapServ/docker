@@ -1,7 +1,7 @@
 FROM rust:1.43@sha256:18aaf0e3fd15310a51601858d79dc490dd123360d60a66c7a88adcd7a8bf9165 AS builder
 
 # renovate: datasource=crate depName=routinator
-ENV ROUTINATOR_VERSION="0.6.4"
+ENV ROUTINATOR_VERSION="0.7.0"
 
 RUN true \
     # Install build toolchain
