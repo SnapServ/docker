@@ -1,1 +1,1 @@
-matrix-synapse[postgres]==1.12.4
+matrix-synapse[postgres]==1.13.0
